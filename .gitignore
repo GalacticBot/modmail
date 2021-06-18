@@ -1,0 +1,9 @@
+# Env
+config.js
+
+# Node bs
+node_modules
+
+# Logs & cache
+logs
+modmail_cache
