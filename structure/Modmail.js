@@ -54,6 +54,7 @@ class Modmail {
         if (this._reminderChannel) {
             this.reminderChannel = this.client.channels.resolve(this._reminderChannel);
             this.reminder = setInterval(this.sendReminder.bind(this), this.reminderInterval * 60 * 1000);
+            this.sendReminder();
         }
 
         // Sweep graveyard every 30 min and move stale channels to graveyard
