@@ -274,7 +274,7 @@ class Modmail {
                     });
 
                     await channel.send({ embed });
-                    
+
                 }
 
                 this.client.cache.channels[user.id] = channel.id;
@@ -552,6 +552,7 @@ class Modmail {
         if (!amount) str = 'No modmail in queue';
         else str = `${amount} modmail in queue.`;
 
+        this.client.logger.debug(`Sending modmail reminder, #mm: ${amount}`);
         if (this.lastReminder) {
             if (channel.lastMessage.id === this.lastReminder.id) return this.lastReminder.edit(str);
             await this.lastReminder.delete();
