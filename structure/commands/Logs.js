@@ -5,7 +5,7 @@ class Logs extends Command {
     constructor(client) {
         super(client, {
             name: 'logs',
-            aliases: ['mmlogs', 'mmhistory'],
+            aliases: ['mmlogs', 'mmhistory', 'mmlog'],
             showUsage: true,
             usage: '<user> [page]'
         });
