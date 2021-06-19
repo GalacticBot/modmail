@@ -194,7 +194,7 @@ class Modmail {
 
         if (this.awaitingChannel[member.id]) return this.awaitingChannel[member.id];
         // eslint-disable-next-line no-async-promise-executor
-        const promise = new Promise(async (resolve) => {
+        const promise = new Promise(async (resolve, reject) => {
 
             const channelID = this.client.cache.channels[member.id];
             const guild = this.mainServer;
@@ -245,19 +245,21 @@ class Modmail {
                         continue;
                     }
 
-                    const mem = entry.author.id === member.id ? member : this.mainServer.members.resolve(entry.author);
+                    const user = await this.client.resolveUser(entry.author).catch(this.client.logger.error.bind(this.client.logger));
+                    const mem = await this.getMember(user.id).catch(this.client.logger.error.bind(this.client.logger));
+                    if (!user) return reject(new Error(`Failed to find user`));
 
                     const embed = {
                         footer: {
-                            text: mem.id
+                            text: user.id
                         },
                         author: {
-                            name: mem.user.tag + (entry.anon ? ' (ANONYMOUS REPLY)' : ''),
+                            name: user.tag + (entry.anon ? ' (ANONYMOUS REPLY)' : ''),
                             // eslint-disable-next-line camelcase
-                            icon_url: mem.user.displayAvatarURL({ dynamic: true })
+                            icon_url: user.displayAvatarURL({ dynamic: true })
                         },
                         description: entry.content,
-                        color: mem.highestRoleColor,
+                        color: mem?.highestRoleColor || 0,
                         fields: [],
                         timestamp: new Date(entry.timestamp)
                     };

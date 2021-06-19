@@ -57,12 +57,12 @@ class ModmailClient extends Client {
         this.modmail.init();
 
         process.on('exit', () => {
+            this.logger.warn('process exiting');
             this.saveCache();
             this.modmail.saveHistory();
-            // eslint-disable-next-line no-process-exit
-            process.exit();
         });
         process.on('SIGINT', () => {
+            this.logger.warn('received sigint');
             this.saveCache.bind(this);
             this.modmail.saveHistory();
             // eslint-disable-next-line no-process-exit
@@ -96,7 +96,12 @@ class ModmailClient extends Client {
         if (message.author.bot) return;
 
         // No command handling in dms, at least for now
-        if (!message.guild) return this.modmail.handleUser(message);
+        if (!message.guild) try {
+            return this.modmail.handleUser(message);
+        } catch (err) {
+            this.logger.error(`Error during user handle:\n${err.stack}`);
+            return;
+        }
 
         const { prefix } = this;
         const { channel, guild, content, member } = message;
