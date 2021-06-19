@@ -2,24 +2,35 @@ const fs = require('fs');
 
 class Modmail {
 
+    // A lot of this can probably be simplified but I wrote all of this in 2 days and I cba to fix this atm
+    // TODO: Fix everything
+
     constructor(client) {
 
         this.client = client;
         this.mainServer = null;
         this.bansServer = null;
 
-        this.categories = client._options.modmailCategory;
-        this.graveyardInactive = client._options.graveyardInactive;
-        this.readInactive = client._options.readInactive;
-        this.channelSweepInterval = client._options.channelSweepInterval;
-        this.saveInterval = client._options.saveInterval;
-        this.anonColor = client._options.anonColor;
+        const opts = client._options;
+
+        this.categories = opts.modmailCategory;
+        this.graveyardInactive = opts.graveyardInactive;
+        this.readInactive = opts.readInactive;
+        this.channelSweepInterval = opts.channelSweepInterval;
+        this.saveInterval = opts.saveInterval;
+        this.anonColor = opts.anonColor;
+        this.reminderInterval = opts.modmailReminderInterval || 30;
+        this._reminderChannel = opts.modmailReminderChannel || null;
+        this.reminderChannel = null;
 
         this.updatedThreads = [];
+        this.queue = [];
         this.mmcache = {};
         this.spammers = {};
         this.replies = {};
         this.awaitingChannel = {};
+
+        this.lastReminder = null;
 
     }
 
@@ -39,6 +50,11 @@ class Modmail {
         this.graveyard = channels.resolve(this.categories[2]);
 
         this.replies = this.loadReplies();
+        this.queue = this.client.cache.queue || [];
+        if (this._reminderChannel) {
+            this.reminderChannel = this.client.channels.resolve(this._reminderChannel);
+            this.reminder = setInterval(this.sendReminder.bind(this), this.reminderInterval * 60 * 1000);
+        }
 
         // Sweep graveyard every 30 min and move stale channels to graveyard
         this.sweeper = setInterval(this.sweepChannels.bind(this), this.channelSweepInterval * 60 * 1000);
@@ -136,6 +152,7 @@ class Modmail {
 
         pastModmail.push({ author: author.id, content, timestamp: Date.now(), isReply: false });
         if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
+        this.queue.push(author.id);
 
         const embed = {
             footer: {
@@ -313,6 +330,7 @@ class Modmail {
 
         const history = await this.loadHistory(userId);
         history.push({ author: member.id, content, timestamp: Date.now(), isReply: true, anon });
+        if (this.queue.includes(userId)) this.queue.splice(this.queue.indexOf(userId), 1);
 
         const embed = {
             author: {
@@ -334,6 +352,11 @@ class Modmail {
 
         if (sent.error) return sent;
 
+        embed.author = {
+            name: author.tag,
+            // eslint-disable-next-line camelcase
+            icon_url: author.displayAvatarURL({ dynamic: true })
+        };
         await channel.send({ embed }).catch((err) => {
             this.client.logger.error(`channel.send errored:\n${err.stack}\nContent: "${content}"`);
         });
@@ -389,6 +412,7 @@ class Modmail {
         await message.channel.send('Delivered.').catch(this.client.logger.error.bind(this.client.logger));
         const channel = await this.loadChannel(targetMember, history).catch(this.client.logger.error.bind(this.client.logger));
         history.push({ author: member.id, content, timestamp: Date.now(), isReply: true, anon });
+        if (this.queue.includes(target.id)) this.queue.splice(this.queue.indexOf(target.id), 1);
         if (!this.updatedThreads.includes(target.id)) this.updatedThreads.push(target.id);
         await channel.send({ embed }).catch(this.client.logger.error.bind(this.client.logger));
         await channel.edit({ parentID: this.readMail.id, lockPermissions: true }).catch(this.client.logger.error.bind(this.client.logger));
@@ -504,10 +528,27 @@ class Modmail {
             msg: `Internal error, this has been logged.`
         };
         history.push({ author: author.id, timestamp: Date.now(), markread: true }); // To keep track of read state
+        if (this.queue.includes(userId)) this.queue.splice(this.queue.indexOf(userId), 1);
 
         await channel.edit({ parentID: this.readMail.id, lockPermissions: true });
         if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(userId);
         return `Done`;
+
+    }
+
+    async sendReminder() {
+
+        const channel = this.reminderChannel;
+        const amount = this.queue.length;
+        let str = '';
+
+        if (!amount) str = 'No modmail in queue';
+        else str = `${amount} modmail in queue.`;
+
+        if (this.lastReminder) {
+            if (channel.lastMessage.id === this.lastReminder.id) return this.lastReminder.edit(str);
+            await this.lastReminder.delete();
+        } else this.lastReminder = await channel.send(str);
 
     }
 

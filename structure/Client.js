@@ -136,6 +136,10 @@ class ModmailClient extends Client {
         return this.resolver.resolveUser(input);
     }
 
+    resolveUsers(input) {
+        return this.resolver.resolveUsers(input);
+    }
+
     async prompt(str, { author, channel, time }) {
 
         if (!channel && author) channel = await author.createDM();
