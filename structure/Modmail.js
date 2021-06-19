@@ -510,7 +510,10 @@ class Modmail {
             if (this.mmcache[userId]) return resolve(this.mmcache[userId]);
 
             const path = `./modmail_cache/${userId}.json`;
-            if (!fs.existsSync(path)) return resolve([]);
+            if (!fs.existsSync(path)) {
+                this.mmcache[userId] = [];
+                return resolve(this.mmcache[userId]);
+            }
 
             fs.readFile(path, { encoding: 'utf-8' }, (err, data) => {
                 if (err) reject(err);
@@ -532,7 +535,11 @@ class Modmail {
 
         for (const id of toSave) {
             const path = `./modmail_cache/${id}.json`;
-            fs.writeFileSync(path, JSON.stringify(this.mmcache[id]));
+            try {
+                fs.writeFileSync(path, JSON.stringify(this.mmcache[id]));
+            } catch (err) {
+                this.client.logger.error(`Error during saving of history\n${id}\n${JSON.stringify(this.mmcache)}\n${err.stack}`);
+            }
         }
 
     }
