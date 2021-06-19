@@ -8,6 +8,10 @@ class Ping extends Command {
         });
     }
 
+    execute() {
+        return `PONG!`;
+    }
+
 }
 
 module.exports = Ping;

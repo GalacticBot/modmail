@@ -11,7 +11,7 @@ class Modmail extends Command {
         });
     }
 
-    async execute(message, args) {
+    async execute(message, { args }) {
 
         // eslint-disable-next-line prefer-const
         let [first, second] = args.map((a) => a);

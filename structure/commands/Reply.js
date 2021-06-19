@@ -11,7 +11,7 @@ class Reply extends Command {
         });
     }
 
-    async execute(message, args) {
+    async execute(message, { args }) {
 
         const [first] = args.map((a) => a);
         // eslint-disable-next-line prefer-const

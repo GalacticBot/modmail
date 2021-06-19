@@ -11,8 +11,8 @@ class Logs extends Command {
         });
     }
 
-    async execute(message, args) {
-
+    async execute(message, { args }) {
+        
         const user = await this.client.resolveUser(args[0]);
         let pageNr = 1;
         if (args[1]) {

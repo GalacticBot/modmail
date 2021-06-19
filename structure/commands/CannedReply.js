@@ -11,8 +11,8 @@ class CannedReply extends Command {
         });
     }
 
-    async execute(message, args) {
-
+    async execute(message, { args }) {
+        
         const [first] = args.map((a) => a);
         // eslint-disable-next-line prefer-const
         let { channel, content, _caller } = message,

@@ -116,7 +116,7 @@ class ModmailClient extends Client {
         }
 
         this.logger.debug(`Executing command ${command.name}`);
-        const result = await command.execute(message, args).catch((err) => {
+        const result = await command.execute(message, { args, clean: message.content.replace(`${this.prefix}${commandName}`, '').trim() }).catch((err) => {
             this.logger.error(`Command ${command.name} errored during execution:\n${err.stack}`);
             return {
                 error: true,
