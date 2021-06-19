@@ -532,6 +532,7 @@ class Modmail {
         const toSave = [...this.updatedThreads];
         this.updatedThreads = [];
         this.client.logger.debug(`Saving modmail data`);
+        if (!fs.existsSync('./modmail_cache')) fs.mkdirSync('./modmail_cache');
 
         for (const id of toSave) {
             const path = `./modmail_cache/${id}.json`;
