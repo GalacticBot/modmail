@@ -352,7 +352,7 @@ class Modmail {
             this.client.logger.error(`Error during channel transition:\n${err.stack}`);
         });
         await message.delete().catch(this.client.logger.warn.bind(this.client.logger));
-        if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
+        if (!this.updatedThreads.includes(userId)) this.updatedThreads.push(userId);
 
     }
 
@@ -398,7 +398,7 @@ class Modmail {
         await message.channel.send('Delivered.').catch(this.client.logger.error.bind(this.client.logger));
         const channel = await this.loadChannel(targetMember, history).catch(this.client.logger.error.bind(this.client.logger));
         history.push({ author: member.id, content, timestamp: Date.now(), isReply: true, anon });
-        if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
+        if (!this.updatedThreads.includes(target.id)) this.updatedThreads.push(target.id);
         await channel.send({ embed }).catch(this.client.logger.error.bind(this.client.logger));
         await channel.edit({ parentID: this.readMail.id }).catch(this.client.logger.error.bind(this.client.logger));
 

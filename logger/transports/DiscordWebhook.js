@@ -41,7 +41,9 @@ class DiscordWebhook extends Transport {
             }
         };
         
-        this.webhookClient.send('', { embeds: [embed] });
+        this.webhookClient.send('', { embeds: [embed] }).catch(() => {
+            // DO nothing
+        });
 
         callback();
     }
