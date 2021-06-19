@@ -7,9 +7,12 @@ class Modmail {
         this.client = client;
         this.mainServer = null;
         this.bansServer = null;
+
         this.categories = client._options.modmailCategory;
         this.graveyardInactive = client._options.graveyardInactive;
         this.readInactive = client._options.readInactive;
+        this.channelSweepInterval = client._options.channelSweepInterval;
+        this.saveInterval = client._options.saveInterval;
 
         this.updatedThreads = [];
         this.mmcache = {};
@@ -35,8 +38,8 @@ class Modmail {
         this.replies = this.loadReplies();
 
         // Sweep graveyard every 30 min and move stale channels to graveyard
-        this.sweeper = setInterval(this.sweepChannels.bind(this), 5 * 60 * 1000);
-        this.saver = setInterval(this.saveHistory.bind(this), 30 * 1000);
+        this.sweeper = setInterval(this.sweepChannels.bind(this), this.channelSweepInterval * 60 * 1000);
+        this.saver = setInterval(this.saveHistory.bind(this), this.saveInterval * 60 * 1000);
 
         let logStr = `Started modmail handler for ${this.mainServer.name}`;
         if (this.bansServer) logStr += ` with ${this.bansServer.name} for ban appeals`;

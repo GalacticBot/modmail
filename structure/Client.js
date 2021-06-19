@@ -59,6 +59,7 @@ class ModmailClient extends Client {
         process.on('exit', this.saveCache.bind(this));
         process.on('SIGINT', () => {
             this.saveCache.bind(this);
+            this.modmail.saveHistory();
             // eslint-disable-next-line no-process-exit
             process.exit();
         });
