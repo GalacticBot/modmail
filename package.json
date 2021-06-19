@@ -8,7 +8,7 @@
   "description": "Modmail bot with eventual integration with Galactic Bot's API",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon --ignore *.json index.js"
   },
   "devDependencies": {
     "eslint": "^7.28.0",

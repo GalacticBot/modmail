@@ -12,6 +12,12 @@ class Registry {
 
     }
 
+    find(name) {
+
+        return this.commands.find((c) => c.name === name || c.aliases?.includes(name));
+
+    }
+
     loadCommands() {
 
         const commandsDir = path.join(process.cwd(), 'structure', 'commands');
