@@ -553,7 +553,8 @@ class Modmail {
         if (this.lastReminder) {
             if (channel.lastMessage.id === this.lastReminder.id) return this.lastReminder.edit(str);
             await this.lastReminder.delete();
-        } else this.lastReminder = await channel.send(str);
+        }
+        this.lastReminder = await channel.send(str);
 
     }
 
