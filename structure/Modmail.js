@@ -264,23 +264,6 @@ class Modmail {
 
     }
 
-    async overflow() { // Overflows new modmail category into read 
-        const channels = this.newMail.children.sort((a, b) => {
-            if (!a.lastMessage) return -1;
-            if (!b.lastMessage) return 1;
-            return a.lastMessage.createdTimestamp - b.lastMessage.createdTimestamp;
-        }).array();
-
-        if (this.readMail.children.size >= 45) await this.sweepChannels({ count: 5, force: true });
-
-        let counter = 0;
-        for (const channel of channels) {
-            await channel.edit({ parentID: this.readMail.id });
-            counter++;
-            if (counter === 5) break;
-        }
-    }
-
     async sendCannedResponse({ message, responseName, anon }) {
 
         const content = this.getCanned(responseName);
@@ -446,7 +429,7 @@ class Modmail {
         this.client.logger.info(`Swept ${channelCount} channels from graveyard, cleaning up answered...`);
 
         const answered = this.readMail.children
-            .filter((channel) => !channel.lastMessage || channel.answered && channel.lastMessage.createdTimestamp < Date.now() - 15 * 60 * 1000 || force)
+            .filter((channel) => !channel.lastMessage || channel.lastMessage.createdTimestamp < Date.now() - 15 * 60 * 1000 || force)
             .sort((a, b) => {
                 if (!a.lastMessage) return -1;
                 if (!b.lastMessage) return 1;
@@ -464,6 +447,23 @@ class Modmail {
 
         this.client.logger.info(`Sweep done. Took ${Date.now() - now}ms`);
 
+    }
+
+    async overflow() { // Overflows new modmail category into read 
+        const channels = this.newMail.children.sort((a, b) => {
+            if (!a.lastMessage) return -1;
+            if (!b.lastMessage) return 1;
+            return a.lastMessage.createdTimestamp - b.lastMessage.createdTimestamp;
+        }).array();
+
+        if (this.readMail.children.size >= 45) await this.sweepChannels({ count: 5, force: true });
+
+        let counter = 0;
+        for (const channel of channels) {
+            await channel.edit({ parentID: this.readMail.id });
+            counter++;
+            if (counter === 5) break;
+        }
     }
 
     async markread(message) {

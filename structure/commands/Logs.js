@@ -26,7 +26,7 @@ class Logs extends Command {
 
         const { member, channel } = message;
         const history = await this.client.modmail.loadHistory(user.id);
-        const page = this.paginate([...history].reverse(), pageNr, 10);
+        const page = this.paginate([...history].filter((e) => !e.markread).reverse(), pageNr, 10);
 
         const embed = {
             author: {

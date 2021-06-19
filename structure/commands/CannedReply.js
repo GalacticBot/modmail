@@ -36,7 +36,7 @@ class CannedReply extends Command {
                 str += `**${name}:** ${content}\n`;
             }
             if (str.length) await channel.send(str).catch(this.client.logger.error.bind(this.client.logger));
-            return;
+            return '**__None__**';
         }
         return this.client.modmail.sendCannedResponse({ message, responseName: content.trim(), anon });
 
