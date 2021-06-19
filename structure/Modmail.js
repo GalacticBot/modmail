@@ -8,7 +8,9 @@ class Modmail {
         this.mainServer = null;
         this.bansServer = null;
         this.categories = client._options.modmailCategory;
-        this.timeout = null;
+        this.graveyardInactive = client._options.graveyardInactive;
+        this.readInactive = client._options.readInactive;
+
         this.updatedThreads = [];
         this.mmcache = {};
         this.spammers = {};
@@ -404,7 +406,7 @@ class Modmail {
         }).array();
 
         let channelCount = 0;
-        if (!age) age = 5 * 60 * 1000; // 1 hour
+        if (!age) age = this.graveyardInactive * 60 * 1000; // 1 hour
         for (const channel of graveyardChannels) {
             
             const { lastMessage } = channel;
@@ -429,7 +431,7 @@ class Modmail {
         this.client.logger.info(`Swept ${channelCount} channels from graveyard, cleaning up answered...`);
 
         const answered = this.readMail.children
-            .filter((channel) => !channel.lastMessage || channel.lastMessage.createdTimestamp < Date.now() - 15 * 60 * 1000 || force)
+            .filter((channel) => !channel.lastMessage || channel.lastMessage.createdTimestamp < Date.now() - this.readInactive * 60 * 1000 || force)
             .sort((a, b) => {
                 if (!a.lastMessage) return -1;
                 if (!b.lastMessage) return 1;
