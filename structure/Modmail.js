@@ -253,7 +253,7 @@ class Modmail {
 
             // Ensure the right category
             //if (channel.parentID !== this.newMail.id)
-            await channel.edit({ parentID: this.newMail.id }).catch((err) => {
+            await channel.edit({ parentID: this.newMail.id, lockPermissions: true }).catch((err) => {
                 this.client.logger.error(`Error during channel transition:\n${err.stack}`);
             });
             delete this.awaitingChannel[user.id];
@@ -333,7 +333,7 @@ class Modmail {
         });
 
         if (this.readMail.children.size > 45) this.sweepChannels({ count: 5, force: true });
-        await channel.edit({ parentID: this.readMail.id }).catch((err) => {
+        await channel.edit({ parentID: this.readMail.id, lockPermissions: true }).catch((err) => {
             this.client.logger.error(`Error during channel transition:\n${err.stack}`);
         });
         await message.delete().catch(this.client.logger.warn.bind(this.client.logger));
@@ -385,7 +385,7 @@ class Modmail {
         history.push({ author: member.id, content, timestamp: Date.now(), isReply: true, anon });
         if (!this.updatedThreads.includes(target.id)) this.updatedThreads.push(target.id);
         await channel.send({ embed }).catch(this.client.logger.error.bind(this.client.logger));
-        await channel.edit({ parentID: this.readMail.id }).catch(this.client.logger.error.bind(this.client.logger));
+        await channel.edit({ parentID: this.readMail.id, lockPermissions: true }).catch(this.client.logger.error.bind(this.client.logger));
 
     }
 
@@ -440,7 +440,7 @@ class Modmail {
         let chCount = this.graveyard.children.size;
         for (const ch of answered) {
             if (chCount < 50) {
-                await ch.edit({ parentID: this.graveyard.id }).catch((err) => {
+                await ch.edit({ parentID: this.graveyard.id, lockPermissions: true }).catch((err) => {
                     this.client.logger.error(`Failed to move channel to graveyard during sweep:\n${err.stack}`);
                 });
                 chCount++;
@@ -462,7 +462,7 @@ class Modmail {
 
         let counter = 0;
         for (const channel of channels) {
-            await channel.edit({ parentID: this.readMail.id });
+            await channel.edit({ parentID: this.readMail.id, lockPermissions: true });
             counter++;
             if (counter === 5) break;
         }
@@ -499,7 +499,7 @@ class Modmail {
         };
         history.push({ author: author.id, timestamp: Date.now(), markread: true }); // To keep track of read state
 
-        await channel.edit({ parentID: this.readMail.id });
+        await channel.edit({ parentID: this.readMail.id, lockPermissions: true });
         if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(userId);
         return `Done`;
 
