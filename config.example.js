@@ -14,6 +14,7 @@ module.exports = {
     channelSweepInterval: 10, // How often channel transitions should be processed in minutes
     saveInterval: 1, // How often modmail history should be written to file in minutes
     evalAccess: [], // Array of IDs that should have access to the bot's eval function
+    anonColor: 0, // A colour value, 0 will default to the bot's highest coloured role
     clientOptions: {
         intents: [ // Needs at least these
             'GUILDS',

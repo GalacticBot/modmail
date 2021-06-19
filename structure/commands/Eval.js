@@ -14,7 +14,7 @@ class Eval extends Command {
 
     async execute(message, { clean }) {
 
-        const { guild, author, member, client } = message; //eslint-disable-line no-unused-vars
+        const { guild, author, member, client, channel } = message; //eslint-disable-line no-unused-vars
         
         try {
             let evaled = eval(clean); //eslint-disable-line no-eval
@@ -30,7 +30,7 @@ class Eval extends Command {
             if (evaled.length > 1850) {
                 evaled = `${evaled.substring(0, 1850)}...`;
             }
-            await message.respond(
+            await channel.send(
                 `Evaluation was successful.\`\`\`js\n${evaled}\`\`\``,
                 { emoji: 'success' }
             );
@@ -42,7 +42,7 @@ class Eval extends Command {
 
             //if (args.log) guild._debugLog(`[${message.author.tag}] Evaluation Fail: ${msg}`);
             if (msg.length > 2000) msg = `${msg.substring(0, 1900)}...`;
-            await message.respond(
+            await channel.send(
                 `Evaluation failed.\`\`\`js\n${msg}\`\`\``,
                 { emoji: 'failure' }
             );

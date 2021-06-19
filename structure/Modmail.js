@@ -13,6 +13,7 @@ class Modmail {
         this.readInactive = client._options.readInactive;
         this.channelSweepInterval = client._options.channelSweepInterval;
         this.saveInterval = client._options.saveInterval;
+        this.anonColor = client._options.anonColor;
 
         this.updatedThreads = [];
         this.mmcache = {};
@@ -29,6 +30,8 @@ class Modmail {
         
         this.bansServer = this.client.bansServer;
         if (!this.bansServer) this.client.logger.warn(`Missing bans server`);
+
+        if (!this.anonColor) this.anonColor = this.mainServer.me.highestRoleColor;
         
         const { channels } = this.mainServer;
         this.newMail = channels.resolve(this.categories[0]);
@@ -203,7 +206,7 @@ class Modmail {
                         }
                     ],
                     footer: { text: `• User ID: ${user.id}` },
-                    color: 479397
+                    color: guild.me.highestRoleColor
                 };
                 if (member.banned) embed.description = `**__USER IS IN BANLAND__**`;
                 else embed.fields.push({
@@ -318,7 +321,7 @@ class Modmail {
                 icon_url: anon ? this.mainServer.iconURL({ dynamic: true }) : author.displayAvatarURL({ dynamic: true })
             },
             description: content,
-            color: member.highestRoleColor
+            color: anon ? this.anonColor : member.highestRoleColor
         };
 
         const sent = await targetUser.send({ embed }).catch((err) => {
@@ -371,7 +374,7 @@ class Modmail {
                 icon_url: anon ? this.mainServer.iconURL({ dynamic: true }) : author.displayAvatarURL({ dynamic: true })
             },
             description: content,
-            color: member.highestRoleColor
+            color: anon ? this.anonColor : member.highestRoleColor
         };
 
         const sent = await target.send({ embed }).catch((err) => {
