@@ -131,6 +131,21 @@ class ModmailClient extends Client {
         return this.resolver.resolveUser(input);
     }
 
+    async prompt(str, { author, channel, time }) {
+
+        if (!channel && author) channel = await author.createDM();
+        if (!channel) throw new Error(`Missing channel for prompt, must pass at least author.`);
+        await channel.send(str);
+        return channel.awaitMessages((m) => m.author.id === author.id, { max: 1, time: time || 30000, errors: ['time'] })
+            .then((collected) => {
+                return collected.first();
+            })
+            .catch((error) => { //eslint-disable-line no-unused-vars, handle-callback-err
+                return null;
+            });
+
+    }
+
 }
 
 module.exports = ModmailClient;

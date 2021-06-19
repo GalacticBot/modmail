@@ -15,14 +15,66 @@ class CannedReply extends Command {
 
         const [first] = args.map((a) => a);
         // eslint-disable-next-line prefer-const
-        let { content, _caller } = message,
+        let { channel, content, _caller } = message,
             anon = false;
         content = content.replace(`${this.client.prefix}${_caller}`, '');
-        if (first.toLowerCase() === 'anon') {
+        const op = args.shift().toLowerCase();
+        if (op === 'anon') {
             anon = true;
             content = content.replace(first, '');
+        } else if (['create', 'delete'].includes(op)) {
+            return this.createCanned(op, args, message);
+        } else if (['list'].includes(first.toLowerCase(op))) {
+
+            const list = Object.entries(this.client.modmail.replies);
+            let str = '';
+            for (const [name, content] of list) {
+                if (str.length + content.length > 2000) {
+                    await channel.send(str).catch(this.client.logger.error.bind(this.client.logger));
+                    str = '';
+                }
+                str += `**${name}:** ${content}\n`;
+            }
+            if (str.length) await channel.send(str).catch(this.client.logger.error.bind(this.client.logger));
+            return;
         }
         return this.client.modmail.sendCannedResponse({ message, responseName: content.trim(), anon });
+
+    }
+
+    async createCanned(op, args, { channel, author }) {
+        
+        if (args.length < 1) return {
+            error: true,
+            msg: 'Missing reply name'
+        };
+        const [_name, ...rest] = args;
+
+        const name = _name.toLowerCase();
+        const canned = this.client.modmail.replies;
+        let confirmation = null;
+
+        if (op === 'create') {
+            if (!rest.length) return {
+                error: true,
+                msg: 'Missing content'
+            };
+
+            if (canned[name]) {
+                confirmation = await this.client.prompt(`A canned reply by the name ${name} already exists, would you like to overwrite it?`, { channel, author });
+                if (!confirmation) return 'Timed out.';
+                confirmation = ['y', 'yes', 'ok'].includes(confirmation.content.toLowerCase());
+                if (!confirmation) return 'Cancelled';
+            }
+
+            canned[name] = rest.join(' ');
+
+        } else {
+            delete canned[name];
+        }
+
+        this.client.modmail.saveReplies();
+        return `Updated ${_name}`;
 
     }
 

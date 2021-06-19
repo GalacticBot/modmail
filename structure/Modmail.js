@@ -34,6 +34,7 @@ class Modmail {
 
         // Sweep graveyard every 30 min and move stale channels to graveyard
         this.sweeper = setInterval(this.sweepChannels.bind(this), 5 * 60 * 1000);
+        this.saver = setInterval(this.saveHistory.bind(this), 30 * 1000);
 
         let logStr = `Started modmail handler for ${this.mainServer.name}`;
         if (this.bansServer) logStr += ` with ${this.bansServer.name} for ban appeals`;
@@ -125,8 +126,7 @@ class Modmail {
         if (!cache._channels) cache._channels = {};
         cache._channels[author.id] = channel;
 
-        this.mmcache[author.id] = pastModmail;
-        this.mmcache[author.id].push({ author: author.id, content, timestamp: Date.now(), isReply: false });
+        pastModmail.push({ author: author.id, content, timestamp: Date.now(), isReply: false });
         if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
 
         const embed = {
@@ -153,8 +153,6 @@ class Modmail {
         await channel.send({ embed }).catch((err) => {
             this.client.logger.error(`channel.send errored:\n${err.stack}\nContent: "${content}"`);
         });
-
-        if(!this.timeout || this.timeout._destroyed) this.timeout = setTimeout(this.saveHistory.bind(this), 30 * 1000);
 
     }
 
@@ -217,6 +215,10 @@ class Modmail {
                 for (let i = context < len ? context : len; i > 0; i--) {
                     const entry = history[len - i];
                     if (!entry) continue;
+                    if (entry.markread) {
+                        i++;
+                        continue;
+                    }
 
                     const mem = entry.author.id === member.id ? member : this.mainServer.members.resolve(entry.author);
 
@@ -350,12 +352,11 @@ class Modmail {
             this.client.logger.error(`Error during channel transition:\n${err.stack}`);
         });
         await message.delete().catch(this.client.logger.warn.bind(this.client.logger));
+        if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
 
     }
 
     async sendModmail({ message, content, anon, target }) {
-        
-        console.log(content, anon, target.tag);
 
         const targetMember = await this.getMember(target.id);
         if (!targetMember) return {
@@ -363,12 +364,12 @@ class Modmail {
             msg: `Cannot find member`
         };
 
-        const pastModmail = await this.loadHistory(target.id)
+        const history = await this.loadHistory(target.id)
             .catch((err) => {
                 this.client.logger.error(`Error during loading of past mail:\n${err.stack}`);
                 return { error: true };
             });
-        if (pastModmail.error) return {
+        if (history.error) return {
             error: true,
             msg: `Internal error, this has been logged.`
         };
@@ -395,7 +396,9 @@ class Modmail {
         if (sent.error) return sent;
 
         await message.channel.send('Delivered.').catch(this.client.logger.error.bind(this.client.logger));
-        const channel = await this.loadChannel(targetMember, pastModmail).catch(this.client.logger.error.bind(this.client.logger));
+        const channel = await this.loadChannel(targetMember, history).catch(this.client.logger.error.bind(this.client.logger));
+        history.push({ author: member.id, content, timestamp: Date.now(), isReply: true, anon });
+        if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
         await channel.send({ embed }).catch(this.client.logger.error.bind(this.client.logger));
         await channel.edit({ parentID: this.readMail.id }).catch(this.client.logger.error.bind(this.client.logger));
 
@@ -465,14 +468,37 @@ class Modmail {
 
     async markread(message) {
 
-        const { channel } = message;
+        const { channel, author } = message;
 
         if (!this.categories.includes(channel.parentID)) return {
             error: true,
             msg: `This command only works in modmail channels.`
         };
 
+        const chCache = this.client.cache.channels;
+        const result = Object.entries(chCache).find(([, val]) => {
+            return val === channel.id;
+        });
+
+        if (!result) return {
+            error: true,
+            msg: `This doesn't seem to be a valid modmail channel. Cache might be out of sync. **[MISSING TARGET]**`
+        };
+
+        const [userId] = result;
+        const history = await this.loadHistory(userId)
+            .catch((err) => {
+                this.client.logger.error(`Error during loading of past mail:\n${err.stack}`);
+                return { error: true };
+            });
+        if (history.error) return {
+            error: true,
+            msg: `Internal error, this has been logged.`
+        };
+        history.push({ author: author.id, timestamp: Date.now(), markread: true }); // To keep track of read state
+
         await channel.edit({ parentID: this.readMail.id });
+        if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(userId);
         return `Done`;
 
     }
@@ -488,7 +514,9 @@ class Modmail {
 
             fs.readFile(path, { encoding: 'utf-8' }, (err, data) => {
                 if (err) reject(err);
-                resolve(JSON.parse(data));
+                const parsed = JSON.parse(data);
+                this.mmcache[userId] = parsed;
+                resolve(parsed);
             });
 
         });
@@ -515,8 +543,16 @@ class Modmail {
 
     loadReplies() {
 
+        this.client.logger.info('Loading canned replies');
         if (!fs.existsSync('./canned_replies.json')) return {};
         return JSON.parse(fs.readFileSync('./canned_replies.json', { encoding: 'utf-8' }));
+
+    }
+
+    saveReplies() {
+
+        this.client.logger.info('Saving canned replies');
+        fs.writeFileSync('./canned_replies.json', JSON.stringify(this.replies));
 
     }
 
