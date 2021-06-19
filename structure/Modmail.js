@@ -150,10 +150,6 @@ class Modmail {
         if (!cache._channels) cache._channels = {};
         cache._channels[author.id] = channel;
 
-        pastModmail.push({ author: author.id, content, timestamp: Date.now(), isReply: false });
-        if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
-        this.queue.push(author.id);
-
         const embed = {
             footer: {
                 text: member.id
@@ -170,10 +166,17 @@ class Modmail {
             timestamp: new Date()
         };
 
-        if (message.attachments.size) embed.fields.push({
-            name: '__Attachments__',
-            value: message.attachments.map((att) => att.url).join('\n').substring(0, 1000)
-        });
+        const attachments = message.attachments.map((att) => att.url);
+        if (message.attachments.size) {
+            embed.fields.push({
+                name: '__Attachments__',
+                value: attachments.join('\n').substring(0, 1000)
+            });
+        }
+
+        pastModmail.push({ attachments, author: author.id, content, timestamp: Date.now(), isReply: false });
+        if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
+        this.queue.push(author.id);
 
         await channel.send({ embed }).catch((err) => {
             this.client.logger.error(`channel.send errored:\n${err.stack}\nContent: "${content}"`);
@@ -209,6 +212,7 @@ class Modmail {
                     parent: this.newMail.id
                 });
 
+                // Start with user info embed
                 const embed = {
                     author: { name: user.tag },
                     thumbnail: {
@@ -233,9 +237,9 @@ class Modmail {
                         `**Roles:** ${member.roles.cache.map((r) => `<@&${r.id}>`).join(' ')}`,
                     inline: false
                 });
-
                 await channel.send({ embed });
 
+                // Load in context
                 const len = history.length;
                 for (let i = context < len ? context : len; i > 0; i--) {
                     const entry = history[len - i];
@@ -270,6 +274,7 @@ class Modmail {
                     });
 
                     await channel.send({ embed });
+                    
                 }
 
                 this.client.cache.channels[user.id] = channel.id;
@@ -354,8 +359,8 @@ class Modmail {
 
         if (sent.error) return sent;
 
-        embed.author = {
-            name: author.tag,
+        if (anon) embed.author = {
+            name: `${author.tag} (ANON)`,
             // eslint-disable-next-line camelcase
             icon_url: author.displayAvatarURL({ dynamic: true })
         };
