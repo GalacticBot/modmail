@@ -95,7 +95,7 @@ class ModmailClient extends Client {
 
         const { prefix } = this;
         const { channel, guild, content, member } = message;
-        if (![this.mainServer.idm, this.bansServer.id].includes(guild.id)) return;
+        if (![this.mainServer.idm, this.bansServer?.id || '0'].includes(guild.id)) return;
         if (!content || !content.startsWith(prefix)) return;
 
         const roles = member.roles.cache.map((r) => r.id);
