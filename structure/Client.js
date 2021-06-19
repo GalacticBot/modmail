@@ -56,7 +56,12 @@ class ModmailClient extends Client {
         this.logger.info(`Starting up modmail handler`);
         this.modmail.init();
 
-        process.on('exit', this.saveCache.bind(this));
+        process.on('exit', () => {
+            this.saveCache();
+            this.modmail.saveHistory();
+            // eslint-disable-next-line no-process-exit
+            process.exit();
+        });
         process.on('SIGINT', () => {
             this.saveCache.bind(this);
             this.modmail.saveHistory();
@@ -66,7 +71,7 @@ class ModmailClient extends Client {
 
         this._ready = true;
 
-        this.cacheSaver = setInterval(this.saveCache.bind(this), 1 * 60 * 1000);
+        this.cacheSaver = setInterval(this.saveCache.bind(this), 10 * 60 * 1000);
 
     }
 
