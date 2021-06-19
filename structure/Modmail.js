@@ -244,10 +244,7 @@ class Modmail {
                 for (let i = context < len ? context : len; i > 0; i--) {
                     const entry = history[len - i];
                     if (!entry) continue;
-                    if (entry.markread) {
-                        i++;
-                        continue;
-                    }
+                    if (entry.markread) continue;
 
                     const user = await this.client.resolveUser(entry.author).catch(this.client.logger.error.bind(this.client.logger));
                     const mem = await this.getMember(user.id).catch(this.client.logger.error.bind(this.client.logger));
