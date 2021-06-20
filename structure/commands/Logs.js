@@ -25,7 +25,7 @@ class Logs extends Command {
         }
 
         const { member, channel } = message;
-        const history = await this.client.modmail.loadHistory(user.id);
+        const history = await this.client.cache.loadModmailHistory(user.id);
         if (!history.length) return 'Not found in modmail DB';
         const page = this.paginate([...history].filter((e) => !e.markread).reverse(), pageNr, 10);
 

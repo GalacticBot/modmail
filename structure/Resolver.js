@@ -86,7 +86,7 @@ class Resolver {
 
         if (typeof resolveables === 'string') resolveables = [resolveables];
         if (resolveables.length === 0) return false;
-        if (!guild) return false;
+        if (!guild) guild = this.client.mainServer;
         const CM = guild.channels;
         const resolved = [];
 

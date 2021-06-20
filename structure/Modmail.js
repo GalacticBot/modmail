@@ -298,14 +298,44 @@ class Modmail {
             msg: `This command only works in modmail channels without arguments.`
         };
 
-        // Eventually support marking several threads read at the same time
-        const [id] = args;
-        let channel = null;
-        const _user = await this.client.resolveUser(id, true);
-        if (!args.length) ({ channel } = message);
-        else if (this.cache.channels[_user.id]) channel = this.client.channels.resolve(this.cache.channels[_user.id]);
-        else channel = await this.client.resolveChannel(id);
+        if (args.length) {
 
+            // Eventually support marking several threads read at the same time
+            const [id] = args;
+            let user = await this.client.resolveUser(id, true);
+            let channel = await this.client.resolveChannel(id);
+
+            if (channel) {
+
+                const chCache = this.cache.channels;
+                const result = Object.entries(chCache).find(([, val]) => {
+                    return val === channel.id;
+                });
+
+                if (!result) return {
+                    error: true,
+                    msg: `That doesn't seem to be a valid modmail channel. Cache might be out of sync. **[MISSING TARGET]**`
+                };
+                    
+                user = await this.client.resolveUser(result[0]);
+                const response = await this.channels.markread(user.id, channel, author);
+                if (response.error) return response;
+                return 'Done';
+                
+            } else if (user) {
+
+                const _ch = this.cache.channels[user.id];
+                if (_ch) channel = await this.client.resolveChannel(_ch);
+
+                const response = await this.channels.markread(user.id, channel, author);
+                if (response.error) return response;
+                return 'Done';
+                
+            }
+
+        }
+
+        const { channel } = message;
         const chCache = this.cache.channels;
         const result = Object.entries(chCache).find(([, val]) => {
             return val === channel.id;

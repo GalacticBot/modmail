@@ -75,9 +75,13 @@ class ChannelHandler {
             error: true,
             msg: `Internal error, this has been logged.`
         };
-        history.push({ author: staff.id, timestamp: Date.now(), markread: true }); // To keep track of read state
+        if (!history.length) return {
+            error: true,
+            msg: `User has no modmail history.`
+        };
+        if(!history[history.length-1].markread) history.push({ author: staff.id, timestamp: Date.now(), markread: true }); // To keep track of read state
         
-        await channel.edit({ parentID: this.readMail.id, lockPermissions: true });
+        if (channel) await channel.edit({ parentID: this.readMail.id, lockPermissions: true });
         if (!this.cache.updatedThreads.includes(target)) this.cache.updatedThreads.push(target);
         if (this.cache.queue.includes(target)) this.cache.queue.splice(this.cache.queue.indexOf(target), 1);
         return {};

@@ -40,8 +40,9 @@ class ModmailClient extends Client {
         this.cache.load();
 
         this.logger.info(`Logging in`);
+        const promise = this.ready();
         await this.login(this._options.discordToken);
-        await this.ready();
+        await promise;
 
         this.mainServer = this.guilds.cache.get(this._options.mainGuild);
         this.bansServer = this.guilds.cache.get(this._options.bansGuild) || null;
@@ -55,8 +56,8 @@ class ModmailClient extends Client {
         });
         process.on('SIGINT', () => {
             this.logger.warn('received sigint');
-            this.cache.save();
-            this.cache.saveModmailHistory(this.modmail);
+            //this.cache.save();
+            //this.cache.saveModmailHistory(this.modmail);
             // eslint-disable-next-line no-process-exit
             process.exit();
         });
