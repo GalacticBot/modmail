@@ -9,3 +9,4 @@ logs
 modmail_cache
 persistent_cache.json
 canned_replies.json
+config - server.js

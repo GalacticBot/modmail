@@ -15,6 +15,8 @@ module.exports = {
     saveInterval: 1, // How often modmail history should be written to file in minutes
     evalAccess: [], // Array of IDs that should have access to the bot's eval function
     anonColor: 0, // A colour value, 0 will default to the bot's highest coloured role
+    modmailReminderInterval: 10, // How often the bot should send a reminder of x new modmails in queue
+    modmailReminderChannel: '', // channel to send reminders in
     clientOptions: {
         intents: [ // Needs at least these
             'GUILDS',
