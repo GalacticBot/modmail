@@ -1,5 +1,4 @@
 const { Client } = require('discord.js');
-const fs = require('fs');
 
 // eslint-disable-next-line no-unused-vars
 const { TextChannel, GuildMember } = require('./extensions');
@@ -7,6 +6,7 @@ const { Logger } = require('../logger');
 const Modmail = require('./Modmail');
 const Registry = require('./Registry');
 const Resolver = require('./Resolver');
+const Cache = require('./Cache');
 
 class ModmailClient extends Client {
 
@@ -20,15 +20,14 @@ class ModmailClient extends Client {
         this.prefix = options.prefix;
 
         this.logger = new Logger(this, options.loggerOptions);
-        this.modmail = new Modmail(this);
         this.registry = new Registry(this);
         this.resolver = new Resolver(this);
+        this.cache = new Cache(this);
+        this.modmail = new Modmail(this);
 
         this.on('ready', () => {
             this.logger.info(`Client ready, logged in as ${this.user.tag}`);
         });
-
-        this.cache = null;
 
     }
 
@@ -38,14 +37,7 @@ class ModmailClient extends Client {
 
         this.on('message', this.handleMessage.bind(this));
 
-        if (fs.existsSync('./persistent_cache.json')) {
-            this.logger.info('Loading cache');
-            this.cache = JSON.parse(fs.readFileSync('./persistent_cache.json', { encoding: 'utf-8' }));
-        } else {
-            this.logger.info('Cache file missing, creating...');
-            this.cache = {};
-            this.saveCache();
-        }
+        this.cache.load();
 
         this.logger.info(`Logging in`);
         await this.login(this._options.discordToken);
@@ -58,27 +50,19 @@ class ModmailClient extends Client {
 
         process.on('exit', () => {
             this.logger.warn('process exiting');
-            this.saveCache();
-            this.modmail.saveHistory();
+            this.cache.save();
+            this.cache.saveModmailHistory(this.modmail);
         });
         process.on('SIGINT', () => {
             this.logger.warn('received sigint');
-            this.saveCache.bind(this);
-            this.modmail.saveHistory();
+            this.cache.save();
+            this.cache.saveModmailHistory(this.modmail);
             // eslint-disable-next-line no-process-exit
             process.exit();
         });
 
         this._ready = true;
 
-        this.cacheSaver = setInterval(this.saveCache.bind(this), 10 * 60 * 1000);
-
-    }
-
-    saveCache() {
-        this.logger.debug('Saving cache');
-        delete this.cache._channels;
-        fs.writeFileSync('./persistent_cache.json', JSON.stringify(this.cache));
     }
 
     ready() {
@@ -112,7 +96,7 @@ class ModmailClient extends Client {
         if(!roles.some((r) => this._options.staffRoles.includes(r)) && !member.hasPermission('ADMINISTRATOR')) return;
 
         const [rawCommand, ...args] = content.split(' ');
-        const commandName = rawCommand.substring(prefix.length).toLowerCase();
+        const commandName = rawCommand.substring(prefix.length);
         const command = this.registry.find(commandName);
         if (!command) return;
         message._caller = commandName;
@@ -142,12 +126,20 @@ class ModmailClient extends Client {
 
     }
 
-    resolveUser(input) {
-        return this.resolver.resolveUser(input);
+    resolveUser(...args) {
+        return this.resolver.resolveUser(...args);
     }
 
-    resolveUsers(input) {
-        return this.resolver.resolveUsers(input);
+    resolveUsers(...args) {
+        return this.resolver.resolveUsers(...args);
+    }
+
+    resolveChannels(...args) {
+        return this.resolver.resolveChannels(...args);
+    }
+
+    resolveChannel(...args) {
+        return this.resolver.resolveChannel(...args);
     }
 
     async prompt(str, { author, channel, time }) {
