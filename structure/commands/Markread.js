@@ -8,9 +8,9 @@ class Markread extends Command {
         });
     }
 
-    async execute(message) {
+    async execute(message, { args }) {
 
-        return this.client.modmail.markread(message);
+        return this.client.modmail.markread(message, args);
 
     }
 

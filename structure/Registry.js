@@ -14,7 +14,7 @@ class Registry {
 
     find(name) {
 
-        return this.commands.find((c) => c.name === name || c.aliases?.includes(name));
+        return this.commands.find((c) => c.name === name.toLowerCase() || c.aliases?.includes(name.toLowerCase()));
 
     }
 

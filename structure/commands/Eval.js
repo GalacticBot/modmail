@@ -14,6 +14,7 @@ class Eval extends Command {
 
     async execute(message, { clean }) {
 
+        if (!this.client._options.evalAccess.includes(message.author.id)) return;
         const { guild, author, member, client, channel } = message; //eslint-disable-line no-unused-vars
         
         try {

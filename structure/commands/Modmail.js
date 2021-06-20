@@ -25,7 +25,7 @@ class Modmail extends Command {
             first = second;
         }
 
-        const user = await this.client.resolveUser(first);
+        const user = await this.client.resolveUser(first, true);
         if (!user) return {
             error: true,
             msg: 'Failed to resolve user'
