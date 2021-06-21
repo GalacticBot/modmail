@@ -17,6 +17,7 @@ module.exports = {
     anonColor: 0, // A colour value, 0 will default to the bot's highest coloured role
     modmailReminderInterval: 10, // How often the bot should send a reminder of x new modmails in queue
     modmailReminderChannel: '', // channel to send reminders in
+    logChannel: '', // Channel in which modmail logs are sent
     clientOptions: {
         intents: [ // Needs at least these
             'GUILDS',
