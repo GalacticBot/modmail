@@ -357,11 +357,13 @@ class Modmail {
 
         const channel = this.reminderChannel;
         const amount = this.queue.length;
-        let str = '';
 
-        if (!amount) str = 'No modmail in queue';
-        else str = `${amount} modmail in queue.`;
+        if (!amount) {
+            if (this.lastReminder) await this.lastReminder.delete();
+            return;
+        }
 
+        const str = `${amount} modmail in queue.`;
         this.client.logger.debug(`Sending modmail reminder, #mm: ${amount}`);
         if (this.lastReminder) {
             if (channel.lastMessage.id === this.lastReminder.id) return this.lastReminder.edit(str);
