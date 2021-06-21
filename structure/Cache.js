@@ -35,7 +35,7 @@ class Cache {
         }
 
         this.cacheSaveInterval = setInterval(this.save.bind(this), 10 * 60 * 1000);
-        this.modmailSaveInterval = setInterval(this.save.bind(this), this.saveInterval * 60 * 1000, this.client.modmail);
+        this.modmailSaveInterval = setInterval(this.saveModmailHistory.bind(this), this.saveInterval * 60 * 1000, this.client.modmail);
         this._ready = true;
 
     }
