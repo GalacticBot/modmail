@@ -32,6 +32,6 @@ Both of these can be used with `!r` and `!cr` respectively and both of them supp
 
 The bot has an `!eval` command which you can grant access to in the config file.
 
-**Creating canned/pre-written replies**
-Simple as using `!cr create <name> <the reply content here>`.
+**Creating canned/pre-written replies**  
+Simple as using `!cr create <name> <the reply content here>`.  
 To delete one, use `!cr delete <name>`
