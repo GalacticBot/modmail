@@ -5,7 +5,7 @@ class Queue extends Command {
     constructor(client) {
         super(client, {
             name: 'queue',
-            aliases: ['mmq', 'mmqueue']
+            aliases: ['mmq', 'mmqueue', 'q']
         });
     }
 
