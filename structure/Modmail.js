@@ -12,13 +12,15 @@ class Modmail {
         this.cache = client.cache;
         this.mainServer = null;
         this.bansServer = null;
+        this.logChannel = null;
+        this.reminderChannel = null;
 
         const opts = client._options;
 
         this.anonColor = opts.anonColor;
         this.reminderInterval = opts.modmailReminderInterval || 30;
         this._reminderChannel = opts.modmailReminderChannel || null;
-        this.reminderChannel = null;
+        this._logChannel = opts.logChannel || null;
         this.categories = opts.modmailCategory;
 
         this.updatedThreads = [];
@@ -50,6 +52,10 @@ class Modmail {
             this.reminderChannel = this.client.channels.resolve(this._reminderChannel);
             this.reminder = setInterval(this.sendReminder.bind(this), this.reminderInterval * 60 * 1000);
             this.sendReminder();
+        }
+
+        if (this._logChannel) {
+            this.logChannel = this.client.channels.resolve(this._logChannel);
         }
 
         let logStr = `Started modmail handler for ${this.mainServer.name}`;
@@ -169,7 +175,10 @@ class Modmail {
 
         pastModmail.push({ attachments, author: author.id, content, timestamp: Date.now(), isReply: false });
         if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
-        if(!this.queue.includes(author.id)) this.queue.push(author.id);
+        if (!this.queue.includes(author.id)) this.queue.push(author.id);
+        
+
+        this.log({ author, action: `${author.tag} (${author.id}) sent new modmail`, content });
 
         await channel.send({ embed }).catch((err) => {
             this.client.logger.error(`channel.send errored:\n${err.stack}\nContent: "${content}"`);
@@ -211,42 +220,15 @@ class Modmail {
 
         // Ensure target exists, this should never run into issues
         const [userId] = result;
-        const targetUser = await this.getUser(userId);
-
-        if (!targetUser) return {
+        const targetMember = await this.getMember(userId);
+        if (!targetMember) return {
             error: true,
             msg: `User seems to have left.\nReport this if the user is still present.`
         };
 
-        const embed = {
-            author: {
-                name: anon ? `${this.mainServer.name.toUpperCase()} STAFF` : author.tag,
-                // eslint-disable-next-line camelcase
-                icon_url: anon ? this.mainServer.iconURL({ dynamic: true }) : author.displayAvatarURL({ dynamic: true })
-            },
-            description: content,
-            color: anon ? this.anonColor : member.highestRoleColor
-        };
-
-        // Send to target user
-        const sent = await targetUser.send({ embed }).catch((err) => {
-            this.client.logger.warn(`Error during DMing user: ${err.message}`);
-            return {
-                error: true,
-                msg: `Failed to send message to target.`
-            };
-        });
-        // Should only error if user has DMs off or has left all mutual servers
-        if (sent.error) return sent;
-
-        if (anon) embed.author = {
-            name: `${author.tag} (ANON)`,
-            // eslint-disable-next-line camelcase
-            icon_url: author.displayAvatarURL({ dynamic: true })
-        };
-
-        await this.channels.send(targetUser, embed, { author: member.id, content, timestamp: Date.now(), isReply: true, anon });
+        this.log({ author, action: `${author.tag}replied to ${targetMember.user.tag}`, content, target: targetMember.user });
         await message.delete().catch(this.client.logger.warn.bind(this.client.logger));
+        return this.send({ target: targetMember, staff: member, content, anon });
 
     }
 
@@ -256,19 +238,30 @@ class Modmail {
         const targetMember = await this.getMember(target.id);
         if (!targetMember) return {
             error: true,
-            msg: `Cannot find member`
+            msg: `Cannot find member.`
         };
 
-        const { author, member } = message;
+        const { member: staff, author } = message;
+
+        // Inline response
+        await message.channel.send('Delivered.').catch(this.client.logger.error.bind(this.client.logger));
+        this.log({ author, action: `${author.tag} sent a message to ${targetMember.user.tag}`, content, target: targetMember.user });
+
+        // Send to channel in server
+        return this.send({ target: targetMember, staff, anon, content });
+
+    }
+
+    async send({ target, staff, anon, content }) {
 
         const embed = {
             author: {
-                name: anon ? `${this.mainServer.name.toUpperCase()} STAFF` : author.tag,
+                name: anon ? `${this.mainServer.name.toUpperCase()} STAFF` : staff.user.tag,
                 // eslint-disable-next-line camelcase
-                icon_url: anon ? this.mainServer.iconURL({ dynamic: true }) : author.displayAvatarURL({ dynamic: true })
+                icon_url: anon ? this.mainServer.iconURL({ dynamic: true }) : staff.user.displayAvatarURL({ dynamic: true })
             },
             description: content,
-            color: anon ? this.anonColor : member.highestRoleColor
+            color: anon ? this.anonColor : staff.highestRoleColor
         };
 
         // Dm the user
@@ -281,11 +274,13 @@ class Modmail {
         });
         if (sent.error) return sent;
 
-        // Inline response
-        await message.channel.send('Delivered.').catch(this.client.logger.error.bind(this.client.logger));
+        if (anon) embed.author = {
+            name: `${staff.user.tag} (ANON)`,
+            // eslint-disable-next-line camelcase
+            icon_url: staff.user.displayAvatarURL({ dynamic: true })
+        };
 
-        // Send to channel in server
-        await this.channels.send(targetMember, embed, { author: member.id, content, timestamp: Date.now(), isReply: true, anon });
+        await this.channels.send(target, embed, { author: staff.id, content, timestamp: Date.now(), isReply: true, anon });
 
     }
 
@@ -298,11 +293,14 @@ class Modmail {
             msg: `This command only works in modmail channels without arguments.`
         };
 
+        let response = null,
+            user = null;
+
         if (args.length) {
 
             // Eventually support marking several threads read at the same time
             const [id] = args;
-            let user = await this.client.resolveUser(id, true);
+            user = await this.client.resolveUser(id, true);
             let channel = await this.client.resolveChannel(id);
 
             if (channel) {
@@ -318,37 +316,39 @@ class Modmail {
                 };
                     
                 user = await this.client.resolveUser(result[0]);
-                const response = await this.channels.markread(user.id, channel, author);
-                if (response.error) return response;
-                return 'Done';
+                response = await this.channels.markread(user.id, channel, author);
                 
             } else if (user) {
 
                 const _ch = this.cache.channels[user.id];
                 if (_ch) channel = await this.client.resolveChannel(_ch);
 
-                const response = await this.channels.markread(user.id, channel, author);
-                if (response.error) return response;
-                return 'Done';
+                response = await this.channels.markread(user.id, channel, author);
                 
-            }
+            } else return `Could not resolve ${id} to a target.`;
 
         }
 
-        const { channel } = message;
-        const chCache = this.cache.channels;
-        const result = Object.entries(chCache).find(([, val]) => {
-            return val === channel.id;
-        });
+        if (!response) {
+            const { channel } = message;
+            const chCache = this.cache.channels;
+            const result = Object.entries(chCache).find(([, val]) => {
+                return val === channel.id;
+            });
 
-        if (!result) return {
-            error: true,
-            msg: `This doesn't seem to be a valid modmail channel. Cache might be out of sync. **[MISSING TARGET]**`
-        };
+            if (!result) return {
+                error: true,
+                msg: `This doesn't seem to be a valid modmail channel. Cache might be out of sync. **[MISSING TARGET]**`
+            };
 
-        const [userId] = result;
-        const response = await this.channels.markread(userId, channel, author);
+            const [userId] = result;
+            user = await this.getUser(userId);
+            response = await this.channels.markread(userId, channel, author);
+        }
+
+        
         if (response.error) return response;
+        this.log({ author, action: `${author.tag} marked ${user.tag}'s thread as read`, target: user });
         return 'Done';
 
     }
@@ -368,6 +368,27 @@ class Modmail {
             await this.lastReminder.delete();
         }
         this.lastReminder = await channel.send(str);
+
+    }
+
+    async log({ author, content, action, target }) {
+        
+        const embed = {
+            author: {
+                name: action,
+                // eslint-disable-next-line camelcase
+                icon_url: author.displayAvatarURL({ dynamic: true })
+            },
+            description: content ? `\`\`\`${content}\`\`\`` : '',
+            color: this.mainServer.me.highestRoleColor
+        };
+        if (target) {
+            embed.footer = {
+                text: `Staff: ${author.id} | Target: ${target.id}`
+            };
+        }
+
+        this.logChannel.send({ embed }).catch(this.client.logger.error.bind(this.client.logger));
 
     }
 
