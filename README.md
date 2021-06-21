@@ -24,7 +24,7 @@ Contributions welcome.
 
 `!reply` - Sends a reply to the user.  
 `!cannedreply` - Sends a pre-written reply to the user.  
-Both of these can be used with `!r` and `!cr` respectively and both of them support the `anon` keyword to send an anonymous reply. The anon keyword has to be the first argument.
+Both of these can be used with `!r` and `!cr` respectively and both of them support the `anon` keyword to send an anonymous reply. The anon keyword has to be the first argument.  
 `!modmail <user> <content>` or `!mm <user> <content>` - Sends a modmail to a user, also supports the anon keyword. `!mm anon @navy.gif#1998 Some content that is sent anonymously`  
 `!markread [user|channel]` - Marks the thread read and moves the channel to the read category indicating that the mail doesn't warrant a response. Messages you've replied to are automatically marked read.  
 `!mmlogs <user> [page]` - Shows user's past modmail.  
