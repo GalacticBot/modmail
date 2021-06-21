@@ -226,7 +226,7 @@ class Modmail {
             msg: `User seems to have left.\nReport this if the user is still present.`
         };
 
-        this.log({ author, action: `${author.tag}replied to ${targetMember.user.tag}`, content, target: targetMember.user });
+        this.log({ author, action: `${author.tag} replied to ${targetMember.user.tag}`, content, target: targetMember.user });
         await message.delete().catch(this.client.logger.warn.bind(this.client.logger));
         return this.send({ target: targetMember, staff: member, content, anon });
 
