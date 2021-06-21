@@ -46,9 +46,9 @@ class ChannelHandler {
             error: true,
             msg: `Internal error, this has been logged.`
         };
-        history.push(newEntry);
 
         const channel = await this.load(target, history).catch(this.client.logger.error.bind(this.client.logger));
+        history.push(newEntry);
         const sent = await channel.send({ embed }).catch((err) => {
             this.client.logger.error(`channel.send errored:\n${err.stack}\nContent: "${embed}"`);
         });
@@ -161,7 +161,8 @@ class ChannelHandler {
                             text: user.id
                         },
                         author: {
-                            name: user.tag + (entry.anon ? ' (ANONYMOUS REPLY)' : ''),
+                            // eslint-disable-next-line no-nested-ternary
+                            name: user.tag + (entry.anon ? ' (ANON)' : entry.isReply ? ' (STAFF)' : ''),
                             // eslint-disable-next-line camelcase
                             icon_url: user.displayAvatarURL({ dynamic: true })
                         },
