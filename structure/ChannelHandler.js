@@ -166,7 +166,8 @@ class ChannelHandler {
                             // eslint-disable-next-line camelcase
                             icon_url: user.displayAvatarURL({ dynamic: true })
                         },
-                        description: entry.content,
+                        // eslint-disable-next-line no-nested-ternary
+                        description: entry.content && entry.content.length ? entry.content.length > 2000 ? `${entry.content.substring(0, 2000)}...\n\n**Content cut off**` : entry.content : `**__MISSING CONTENT__**`,
                         color: mem?.highestRoleColor || 0,
                         fields: [],
                         timestamp: new Date(entry.timestamp)
