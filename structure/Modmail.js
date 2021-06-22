@@ -359,7 +359,10 @@ class Modmail {
         const amount = this.queue.length;
 
         if (!amount) {
-            if (this.lastReminder) await this.lastReminder.delete();
+            if (this.lastReminder) {
+                await this.lastReminder.delete();
+                this.lastReminder = null;
+            }
             return;
         }
 
