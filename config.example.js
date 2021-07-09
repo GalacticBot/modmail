@@ -6,7 +6,7 @@ module.exports = {
     mainGuild: '', // main server of operation
     bansGuild: '', // optional bans server for potential appeals processing
     prefix: '!',
-    modmailCategory: [], // Should have 3 category IDs, main category (new), answered/waiting for reply, graveyard (old modmail channels getting ready for deletion)
+    modmailCategory: [], // Should have 3 category IDs (AS STRINGS), main category (new), answered/waiting for reply, graveyard (old modmail channels getting ready for deletion)
     context: 10, // How many messages to load for context
     staffRoles: [], // Roles that have access to the bot commands
     graveyardInactive: 60, // How long a channel should be inactive for in the graveyard before deletion

@@ -10,7 +10,7 @@ class ChannelHandler {
         this.mainServer = null;
         this.bansServer = null;
 
-        this.categories = opts.modmailCategory;
+        this.categories = opts.modmailCategory.map((id) => id.toString());
         this.cache = modmail.cache;
 
         this.graveyardInactive = opts.graveyardInactive;
@@ -26,8 +26,15 @@ class ChannelHandler {
         
         const { channels } = this.mainServer;
         this.newMail = channels.resolve(this.categories[0]);
+        if (!this.newMail) this.client.logger.warn(`Missing new mail category!`);
         this.readMail = channels.resolve(this.categories[1]);
+        if (!this.readMail) this.client.logger.warn(`Missing read mail category!`);
         this.graveyard = channels.resolve(this.categories[2]);
+        if (!this.graveyard) this.client.logger.warn(`Missing graveyard category!`);
+        
+        if (!this.newMail || !this.readMail || !this.graveyard) {
+            this.client.logger.debug(`Some mail categories were missing: ${this.categories}`);
+        }
 
         // Sweep graveyard every x min and move stale channels to graveyard
         this.sweeper = setInterval(this.sweepChannels.bind(this), this.channelSweepInterval * 60 * 1000);
@@ -211,6 +218,7 @@ class ChannelHandler {
 
         this.client.logger.info(`Sweeping graveyard`);
         const now = Date.now();
+        if (!this.graveyard) return this.client.logger.error(`Missing graveyard category!`);
         const graveyardChannels = this.graveyard.children.sort((a, b) => {
             if (!a.lastMessage) return -1;
             if (!b.lastMessage) return 1;
@@ -241,6 +249,7 @@ class ChannelHandler {
         }
 
         this.client.logger.info(`Swept ${channelCount} channels from graveyard, cleaning up answered...`);
+        if (!this.readMail) return this.client.logger.error(`Missing read mail category!`);
 
         const answered = this.readMail.children
             .filter((channel) => !channel.lastMessage || channel.lastMessage.createdTimestamp < Date.now() - this.readInactive * 60 * 1000 || force)
