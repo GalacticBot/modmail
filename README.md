@@ -33,5 +33,8 @@ Both of these can be used with `!r` and `!cr` respectively and both of them supp
 The bot has an `!eval` command which you can grant access to in the config file.
 
 **Creating canned/pre-written replies**  
-Simple as using `!cr create <name> <the reply content here>`.  
+Simple as using `!cr create <name> <the reply content here>`. Updating an existing entry is done by overwriting it.  
 To delete one, use `!cr delete <name>`
+
+## TODO  
+`!markunread` - Marks a thread unread

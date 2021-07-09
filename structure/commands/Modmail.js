@@ -23,6 +23,9 @@ class Modmail extends Command {
             anon = true;
             content = content.replace(first, '');
             first = second;
+        } else if (second.toLowerCase() === 'anon') {
+            anon = true;
+            content = content.replace(second, '');
         }
 
         const user = await this.client.resolveUser(first, true);
