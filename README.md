@@ -39,6 +39,8 @@ To delete one, use `!cr delete <name>`
 ## TODO LIST  
 **Commands**  
 - `!markunread` - Marks a thread unread  
+- `!refresh`- Refresh threads (recreate channels and repopulate them if the channel was hidden/deleted due to overflow)  
+- `!reload` - Unsure if needed, putting here just in case. Would restart the bot when ran.  
 
 **Other**  
 - Display more specific information instead of just "User is in banland" (should reflect whether user is actually banned or otherwise in the appeals server.  
