@@ -11,10 +11,13 @@ class Cache {
         this.saveInterval = opts.saveInterval;
         this._ready = false;
 
+        // Data that gets stored to persistent cache
         this.queue = [];
         this.channels = {};
         this.lastActivity = {};
+        this.misc = {}; // Random misc data, should not be non-primitive data types
 
+        // Stored separately if at all
         this.modmail = {};
         this.updatedThreads = [];
 
@@ -91,7 +94,8 @@ class Cache {
         return {
             queue: this.queue,
             channels: this.channels,
-            lastActivity: this.lastActivity
+            lastActivity: this.lastActivity,
+            misc: this.misc
         };
     }
 

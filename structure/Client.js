@@ -47,7 +47,7 @@ class ModmailClient extends Client {
         this.mainServer = this.guilds.cache.get(this._options.mainGuild);
         this.bansServer = this.guilds.cache.get(this._options.bansGuild) || null;
         this.logger.info(`Starting up modmail handler`);
-        this.modmail.init();
+        await this.modmail.init();
 
         process.on('exit', () => {
             this.logger.warn('process exiting');

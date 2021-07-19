@@ -35,7 +35,7 @@ class Modmail {
 
     }
 
-    init() {
+    async init() {
 
         this.mainServer = this.client.mainServer;
         if (!this.mainServer) throw new Error(`Missing main server`);
@@ -51,6 +51,7 @@ class Modmail {
         if (this._reminderChannel) {
             this.reminderChannel = this.client.channels.resolve(this._reminderChannel);
             this.reminder = setInterval(this.sendReminder.bind(this), this.reminderInterval * 60 * 1000);
+            this.lastReminder = await this.reminderChannel.messages.fetch(this.cache.misc.lastReminder).catch(() => null);
             this.sendReminder();
         }
 
@@ -374,6 +375,7 @@ class Modmail {
             await this.lastReminder.delete();
         }
         this.lastReminder = await channel.send(str);
+        this.cache.lastReminder = this.lastReminder.id;
 
     }
 
