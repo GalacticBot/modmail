@@ -251,8 +251,6 @@ class Modmail {
         await message.channel.send('Delivered.').catch(this.client.logger.error.bind(this.client.logger));
         this.log({ author, action: `${author.tag} sent a message to ${targetMember.user.tag}`, content, target: targetMember.user });
 
-        
-
     }
 
     async send({ target, staff, anon, content }) {

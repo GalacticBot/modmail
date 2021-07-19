@@ -142,9 +142,11 @@ class ChannelHandler {
                     color: guild.me.highestRoleColor
                 };
                 if (member && member.inAppealServer) {
-                    const ban = await guild.fetchBan(member.id).catch(() => null);
-                    if (ban) embed.description = `**__USER IS BANNED FROM MAIN SERVER__**`;
-                    else embed.description = `**__USER IS IN APPEAL SERVER BUT NOT BANNED FROM MAIN__**`;
+                    if (guild.me.hasPermission('BAN_MEMBERS')) {
+                        const ban = await guild.fetchBan(member.id).catch(() => null);
+                        if (ban) embed.description = `**__USER IS BANNED FROM MAIN SERVER__**`;
+                        else embed.description = `**__USER IS IN APPEAL SERVER BUT NOT BANNED FROM MAIN__**`;
+                    } else embed.description = `**__USER IS IN APPEAL SERVER__**`;
                 } else if (member) embed.fields.push({
                     name: '__Member Data__',
                     value: `**Nickname:** ${member.nickname || 'N/A'}\n` +
