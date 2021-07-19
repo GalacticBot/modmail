@@ -43,6 +43,6 @@ To delete one, use `!cr delete <name>`
 - `!reload` - Unsure if needed, putting here just in case. Would restart the bot when ran.  
 
 **Other**  
-- Display more specific information instead of just "User is in banland" (should reflect whether user is actually banned or otherwise in the appeals server.  
+- ~~Display more specific information instead of just "User is in banland" (should reflect whether user is actually banned or otherwise in the appeals server.~~  
 - Add something to display character count for messages, either command or an option to toggle.  
 - Allow arbitrary order of `anon` and `user` arguments for `!modmail` command.
