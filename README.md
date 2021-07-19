@@ -36,9 +36,10 @@ The bot has an `!eval` command which you can grant access to in the config file.
 Simple as using `!cr create <name> <the reply content here>`. Updating an existing entry is done by overwriting it.  
 To delete one, use `!cr delete <name>`
 
-## TODO  
-`!markunread` - Marks a thread unread  
-
-Display more specific information instead of just "User is in banland" (should reflect whether user is actually banned or otherwise in the appeals server.  
-Add something to display character count for messages, either command or an option to toggle.  
-Allow arbitrary order of `anon` and `user` arguments for `!modmail` command.
+## TODO LIST  
+**Commands**  
+- `!markunread` - Marks a thread unread  
+**Other**  
+- Display more specific information instead of just "User is in banland" (should reflect whether user is actually banned or otherwise in the appeals server.  
+- Add something to display character count for messages, either command or an option to toggle.  
+- Allow arbitrary order of `anon` and `user` arguments for `!modmail` command.
