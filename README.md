@@ -39,6 +39,7 @@ To delete one, use `!cr delete <name>`
 ## TODO LIST  
 **Commands**  
 - `!markunread` - Marks a thread unread  
+
 **Other**  
 - Display more specific information instead of just "User is in banland" (should reflect whether user is actually banned or otherwise in the appeals server.  
 - Add something to display character count for messages, either command or an option to toggle.  
