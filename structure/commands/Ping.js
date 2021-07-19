@@ -8,7 +8,7 @@ class Ping extends Command {
         });
     }
 
-    execute() {
+    async execute() {
         return `PONG!`;
     }
 

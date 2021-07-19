@@ -141,8 +141,11 @@ class ChannelHandler {
                     footer: { text: `• User ID: ${user.id}` },
                     color: guild.me.highestRoleColor
                 };
-                if (member && member.banned) embed.description = `**__USER IS IN BANLAND__**`;
-                else if (member) embed.fields.push({
+                if (member && member.inAppealServer) {
+                    const ban = await guild.fetchBan(member.id).catch(() => null);
+                    if (ban) embed.description = `**__USER IS BANNED FROM MAIN SERVER__**`;
+                    else embed.description = `**__USER IS IN APPEAL SERVER BUT NOT BANNED FROM MAIN__**`;
+                } else if (member) embed.fields.push({
                     name: '__Member Data__',
                     value: `**Nickname:** ${member.nickname || 'N/A'}\n` +
                         `**Server join date:** ${member.joinedAt.toDateString()}\n` +

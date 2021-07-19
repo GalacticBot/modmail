@@ -81,7 +81,7 @@ class Modmail {
             if(!result) result = await this.bansServer.members.fetch(user).catch(() => {
                 return null;
             });
-            if (result) result.banned = true;
+            if (result) result.inAppealServer = true;
         }
 
         return result;
@@ -243,12 +243,15 @@ class Modmail {
 
         const { member: staff, author } = message;
 
+        // Send to channel in server & target
+        const sent = await this.send({ target: targetMember, staff, anon, content });
+        if (sent.error) return sent;
+
         // Inline response
         await message.channel.send('Delivered.').catch(this.client.logger.error.bind(this.client.logger));
         this.log({ author, action: `${author.tag} sent a message to ${targetMember.user.tag}`, content, target: targetMember.user });
 
-        // Send to channel in server
-        return this.send({ target: targetMember, staff, anon, content });
+        
 
     }
 
@@ -280,7 +283,7 @@ class Modmail {
             icon_url: staff.user.displayAvatarURL({ dynamic: true })
         };
 
-        await this.channels.send(target, embed, { author: staff.id, content, timestamp: Date.now(), isReply: true, anon });
+        return this.channels.send(target, embed, { author: staff.id, content, timestamp: Date.now(), isReply: true, anon });
 
     }
 
