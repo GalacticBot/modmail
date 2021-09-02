@@ -10,7 +10,7 @@ class Markread extends Command {
 
     async execute(message, { args }) {
 
-        return this.client.modmail.markread(message, args);
+        return this.client.modmail.changeReadState(message, args);
 
     }
 

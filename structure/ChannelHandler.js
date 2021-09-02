@@ -71,7 +71,7 @@ class ChannelHandler {
 
     }
 
-    async markread(target, channel, staff) {
+    async setReadState(target, channel, staff, state) {
         
         const history = await this.cache.loadModmailHistory(target)
             .catch((err) => {
@@ -86,11 +86,13 @@ class ChannelHandler {
             error: true,
             msg: `User has no modmail history.`
         };
-        if(!history[history.length-1].markread) history.push({ author: staff.id, timestamp: Date.now(), markread: true }); // To keep track of read state
+        if (history[history.length - 1].readState !== state) history.push({ author: staff.id, timestamp: Date.now(), readState: state }); // To keep track of read state
+        if (state === 'unread') await this.load(await this.client.resolveUser(target), history);
         
-        if (channel) await channel.edit({ parentID: this.readMail.id, lockPermissions: true });
+        if (channel) await channel.edit({ parentID: state === 'read' ? this.readMail.id : this.newMail.id, lockPermissions: true });
         if (!this.cache.updatedThreads.includes(target)) this.cache.updatedThreads.push(target);
-        if (this.cache.queue.includes(target)) this.cache.queue.splice(this.cache.queue.indexOf(target), 1);
+        if (this.cache.queue.includes(target) && state === 'read') this.cache.queue.splice(this.cache.queue.indexOf(target), 1);
+        else if (!this.cache.queue.includes(target)) this.cache.queue.push(target);
         return {};
 
     }
@@ -162,7 +164,7 @@ class ChannelHandler {
                 for (let i = context < len ? context : len; i > 0; i--) {
                     const entry = history[len - i];
                     if (!entry) continue;
-                    if (entry.markread) continue;
+                    if (entry.readState === 'read') continue;
 
                     const user = await this.client.resolveUser(entry.author).catch(this.client.logger.error.bind(this.client.logger));
                     const mem = await this.modmail.getMember(user.id).catch(this.client.logger.error.bind(this.client.logger));

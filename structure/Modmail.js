@@ -286,7 +286,7 @@ class Modmail {
 
     }
 
-    async markread(message, args) {
+    async changeReadState(message, args, state = 'read') {
 
         const { author } = message;
 
@@ -318,14 +318,14 @@ class Modmail {
                 };
                     
                 user = await this.client.resolveUser(result[0]);
-                response = await this.channels.markread(user.id, channel, author);
+                response = await this.channels.setReadState(user.id, channel, author, state);
                 
             } else if (user) {
 
                 const _ch = this.cache.channels[user.id];
                 if (_ch) channel = await this.client.resolveChannel(_ch);
 
-                response = await this.channels.markread(user.id, channel, author);
+                response = await this.channels.setReadState(user.id, channel, author, state);
                 
             } else return `Could not resolve ${id} to a target.`;
 
@@ -345,12 +345,12 @@ class Modmail {
 
             const [userId] = result;
             user = await this.getUser(userId);
-            response = await this.channels.markread(userId, channel, author);
+            response = await this.channels.setReadState(userId, channel, author, state);
         }
 
         
         if (response.error) return response;
-        this.log({ author, action: `${author.tag} marked ${user.tag}'s thread as read`, target: user });
+        this.log({ author, action: `${author.tag} marked ${user.tag}'s thread as ${state}`, target: user });
         return 'Done';
 
     }
