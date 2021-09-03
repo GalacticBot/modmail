@@ -30,6 +30,7 @@ Both of these can be used with `!r` and `!cr` respectively and both of them supp
 `!markunread [user|channel]` - Marks the thread unread.  
 `!mmlogs <user> [page]` - Shows user's past modmail.  
 `!mmqueue` - Shows users in queue.  
+`!id [channel]` - Get the target user ID for the modmail thread. Can be used without the channel argument in a modmail channel, outside of a modmail channel will return the user ID for the channel's target if available.
 
 The bot has an `!eval` command which you can grant access to in the config file.
 
