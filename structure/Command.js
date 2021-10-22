@@ -1,8 +1,8 @@
 class Command {
 
-    constructor(client, options) {
+    constructor (client, options) {
         
-        Object.entries(options).forEach(([key, val]) => {
+        Object.entries(options).forEach(([ key, val ]) => {
             this[key] = val;
         });
 
@@ -12,7 +12,7 @@ class Command {
 
     }
 
-    async execute() {
+    async execute () {
         throw new Error(`Missing execute in ${this.name}`);
     }
 

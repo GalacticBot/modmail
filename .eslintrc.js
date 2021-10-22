@@ -1,24 +1,30 @@
 module.exports = {
-    'env': {
-        'commonjs': true,
-        'es2021': true,
-        'node': true
+    "env": {
+        "es6": true,
+        "node": true
     },
-    'extends': 'eslint:recommended',
-    'parserOptions': {
-        'ecmaVersion': 12
+    "extends": "eslint:recommended",
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
     },
-    'rules': {
+    "parserOptions": {
+        "ecmaVersion": 2020,
+        "sourceType": "module"
+    },
+    "rules": {
         "accessor-pairs": "warn",
         "array-callback-return": "warn",
-        "arrow-parens": "warn",
+        "array-bracket-newline": [ "warn", "consistent" ],
+        "array-bracket-spacing": [ "warn", "always", { "objectsInArrays": false, "arraysInArrays": false }],
+        // "arrow-parens": "warn",
         "arrow-spacing": "warn",
         "block-scoped-var": "warn",
-        "block-spacing": "warn",
-        "brace-style": "warn",
+        "block-spacing": [ "warn", "always" ],
+        "brace-style": [ "warn", "1tbs" ],
         "callback-return": "warn",
         "camelcase": "warn",
-        "comma-dangle": "warn",
+        "comma-dangle": [ "warn", "only-multiline" ],
         "comma-spacing": [
             "warn",
             {
@@ -38,6 +44,10 @@ module.exports = {
                 "allowKeywords": true
             }
         ],
+        "dot-location": [
+            "error",
+            "property"
+        ],
         "eol-last": [
             "warn",
             "never"
@@ -55,18 +65,13 @@ module.exports = {
         "id-blacklist": "warn",
         "id-match": "warn",
         "implicit-arrow-linebreak": "warn",
-        "indent": [
-            "warn",
-            4,
-            {
-                "SwitchCase": 1
-            }
-        ],
+        "indent": "warn",
         "init-declarations": "warn",
-        "jsx-quotes": "warn",
-        "key-spacing": "warn",
+        "jsx-quotes": [ "warn", "prefer-single" ],
+        "key-spacing": [ "warn", { "beforeColon": false, "afterColon": true }],
+        "keyword-spacing": [ "warn", { "after": true, "before": true }],
         "linebreak-style": [
-            "warn",
+            "error",
             "windows"
         ],
         "lines-around-comment": "warn",
@@ -98,13 +103,14 @@ module.exports = {
         "no-floating-decimal": "warn",
         "no-implicit-coercion": "warn",
         "no-implicit-globals": "warn",
-        "no-implied-eval": "warn",
+        "no-implied-eval": "error",
         "no-import-assign": "warn",
         "no-invalid-this": "warn",
         "no-iterator": "warn",
         "no-label-var": "warn",
         // "no-labels": "warn",
         "no-lone-blocks": "warn",
+        "no-lonely-if": "warn",
         "no-loop-func": "warn",
         "no-mixed-requires": "warn",
         "no-multi-assign": "warn",
@@ -113,6 +119,7 @@ module.exports = {
         "no-multiple-empty-lines": "warn",
         "no-native-reassign": "warn",
         "no-negated-in-lhs": "warn",
+        "no-negated-condition": "error",
         "no-nested-ternary": "warn",
         "no-new": "warn",
         "no-new-func": "warn",
@@ -135,14 +142,16 @@ module.exports = {
         "no-sequences": "warn",
         "no-setter-return": "warn",
         "no-spaced-func": "warn",
+        "no-shadow": "error",
         "no-tabs": "warn",
-        "no-template-curly-in-string": "warn",
+        "no-template-curly-in-string": "error",
         "no-throw-literal": "warn",
-        "no-undef-init": "warn",
+        "no-undef-init": "error",
+        "no-undefined": "error",
         "no-unmodified-loop-condition": "warn",
-        "no-unneeded-ternary": "warn",
+        "no-unneeded-ternary": "error",
         "no-unused-expressions": "warn",
-        "no-use-before-define": "warn",
+        "no-use-before-define": "error",
         "no-useless-call": "warn",
         "no-useless-computed-key": "warn",
         "no-useless-concat": "warn",
@@ -151,22 +160,25 @@ module.exports = {
         "no-useless-return": "warn",
         "no-var": "warn",
         "no-void": "warn",
-        "no-whitespace-before-property": "warn",
+        "no-whitespace-before-property": "error",
         "nonblock-statement-body-position": "warn",
         "object-curly-spacing": [
             "warn",
             "always"
         ],
+        "object-property-newline": [ "warn", { "allowAllPropertiesOnSameLine": true }],
         "object-shorthand": "warn",
         "one-var-declaration-per-line": "warn",
         "operator-assignment": "warn",
+        "operator-linebreak": [ "warn", "before" ],
         "padding-line-between-statements": "warn",
+        "padded-blocks": [ "warn", { "switches": "never" }, { "allowSingleLineBlocks": true }],
         "prefer-arrow-callback": "warn",
         "prefer-const": "warn",
         "prefer-destructuring": "warn",
         "prefer-exponentiation-operator": "warn",
         "prefer-numeric-literals": "warn",
-        "prefer-object-spread": "warn",
+        "prefer-object-spread": "error",
         "prefer-promise-reject-errors": "warn",
         "prefer-regex-literals": "warn",
         "prefer-rest-params": "warn",
@@ -174,17 +186,20 @@ module.exports = {
         "require-jsdoc": "warn",
         "require-unicode-regexp": "warn",
         "rest-spread-spacing": "warn",
-        "semi": "warn",
+        "semi": "error",
         "semi-spacing": "warn",
         "semi-style": [
             "warn",
             "last"
         ],
         "space-before-blocks": "warn",
+        "space-before-function-paren": [ "error", "always" ],
         "space-in-parens": [
             "warn",
             "never"
         ],
+        "spaced-comment": [ "warn", "always" ],
+        "strict": "warn",
         "switch-colon-spacing": "warn",
         "symbol-description": "warn",
         "template-curly-spacing": [
@@ -198,7 +213,7 @@ module.exports = {
         ],
         "vars-on-top": "warn",
         "wrap-iife": "warn",
-        "wrap-regex": "warn",
+        "wrap-regex": "error",
         "yield-star-spacing": "warn",
         "yoda": [
             "warn",

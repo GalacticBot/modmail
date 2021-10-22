@@ -2,14 +2,14 @@ const Command = require('../Command');
 
 class Queue extends Command {
 
-    constructor(client) {
+    constructor (client) {
         super(client, {
             name: 'queue',
-            aliases: ['mmq', 'mmqueue', 'q']
+            aliases: [ 'mmq', 'mmqueue', 'q' ]
         });
     }
 
-    async execute(message) {
+    async execute (message) {
         
         const { queue } = this.client.modmail;
         if (!queue.length) return 'Queue is empty!';

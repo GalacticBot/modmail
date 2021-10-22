@@ -2,13 +2,13 @@ const Command = require('../Command');
 
 class Markread extends Command {
 
-    constructor(client) {
+    constructor (client) {
         super(client, {
             name: 'markread'
         });
     }
 
-    async execute(message, { args }) {
+    async execute (message, { args }) {
 
         return this.client.modmail.changeReadState(message, args);
 

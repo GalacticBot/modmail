@@ -2,19 +2,19 @@ const Command = require('../Command');
 
 class Modmail extends Command {
 
-    constructor(client) {
+    constructor (client) {
         super(client, {
             name: 'modmail',
-            aliases: ['mm'],
+            aliases: [ 'mm' ],
             showUsage: true,
             usage: `<user> <content>`
         });
     }
 
-    async execute(message, { args }) {
+    async execute (message, { args }) {
 
         // eslint-disable-next-line prefer-const
-        let [first, second] = args.map((a) => a);
+        let [ first, second ] = args.map((a) => a);
         // eslint-disable-next-line prefer-const
         let { content, _caller } = message,
             anon = false;

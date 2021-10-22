@@ -2,16 +2,16 @@ const Command = require('../Command');
 
 class Logs extends Command {
 
-    constructor(client) {
+    constructor (client) {
         super(client, {
             name: 'logs',
-            aliases: ['mmlogs', 'mmhistory', 'mmlog'],
+            aliases: [ 'mmlogs', 'mmhistory', 'mmlog' ],
             showUsage: true,
             usage: '<user> [page]'
         });
     }
 
-    async execute(message, { args }) {
+    async execute (message, { args }) {
         
         const user = await this.client.resolveUser(args[0]);
         let pageNr = 1;
@@ -27,7 +27,7 @@ class Logs extends Command {
         const { member, channel } = message;
         const history = await this.client.cache.loadModmailHistory(user.id);
         if (!history.length) return 'Not found in modmail DB';
-        const page = this.paginate([...history].filter((e) => !('readState' in e)).reverse(), pageNr, 10);
+        const page = this.paginate([ ...history ].filter((e) => !('readState' in e)).reverse(), pageNr, 10);
 
         const embed = {
             author: {
@@ -43,6 +43,7 @@ class Logs extends Command {
         };
 
         for (const entry of page.items) {
+            // eslint-disable-next-line no-shadow
             const user = await this.client.resolveUser(entry.author);
             embed.fields.push({
                 name: `${user.tag}${entry.anon ? ' (ANON)' : ''} @ ${new Date(entry.timestamp).toUTCString()}`,
@@ -54,7 +55,7 @@ class Logs extends Command {
 
     }
 
-    paginate(items, page = 1, pageLength = 10) {
+    paginate (items, page = 1, pageLength = 10) {
         const maxPage = Math.ceil(items.length / pageLength);
         if (page < 1) page = 1;
         if (page > maxPage) page = maxPage;

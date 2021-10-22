@@ -1,6 +1,6 @@
 class ChannelHandler {
 
-    constructor(modmail, opts) {
+    constructor (modmail, opts) {
 
         this.modmail = modmail;
         this.client = modmail.client;
@@ -19,7 +19,7 @@ class ChannelHandler {
 
     }
 
-    init() {
+    init () {
 
         this.mainServer = this.modmail.mainServer;
         this.bansServer = this.modmail.bansServer;
@@ -41,7 +41,7 @@ class ChannelHandler {
 
     }
 
-    async send(target, embed, newEntry) {
+    async send (target, embed, newEntry) {
 
         // Load & update the users past modmails
         const history = await this.cache.loadModmailHistory(target.id)
@@ -71,7 +71,7 @@ class ChannelHandler {
 
     }
 
-    async setReadState(target, channel, staff, state) {
+    async setReadState (target, channel, staff, state) {
         
         const history = await this.cache.loadModmailHistory(target)
             .catch((err) => {
@@ -106,7 +106,7 @@ class ChannelHandler {
      * @return {TextChannel} 
      * @memberof ChannelHandler
      */
-    load(target, history) {
+    load (target, history) {
 
         if (this.awaitingChannel[target.id]) return this.awaitingChannel[target.id];
         // eslint-disable-next-line no-async-promise-executor
@@ -135,8 +135,8 @@ class ChannelHandler {
                     fields: [
                         {
                             name: '__User Data__',
-                            value: `**User:** <@${user.id}>\n` +
-                                `**Account created:** ${user.createdAt.toDateString()}\n`,
+                            value: `**User:** <@${user.id}>\n`
+                                + `**Account created:** ${user.createdAt.toDateString()}\n`,
                             inline: false
                         }
                     ],
@@ -151,9 +151,9 @@ class ChannelHandler {
                     } else embed.description = `**__USER IS IN APPEAL SERVER__**`;
                 } else if (member) embed.fields.push({
                     name: '__Member Data__',
-                    value: `**Nickname:** ${member.nickname || 'N/A'}\n` +
-                        `**Server join date:** ${member.joinedAt.toDateString()}\n` +
-                        `**Roles:** ${member.roles.cache.filter((r) => r.id !== guild.roles.everyone.id).map((r) => `<@&${r.id}>`).join(' ')}`,
+                    value: `**Nickname:** ${member.nickname || 'N/A'}\n`
+                        + `**Server join date:** ${member.joinedAt.toDateString()}\n`
+                        + `**Roles:** ${member.roles.cache.filter((r) => r.id !== guild.roles.everyone.id).map((r) => `<@&${r.id}>`).join(' ')}`,
                     inline: false
                 });
 
@@ -166,10 +166,12 @@ class ChannelHandler {
                     if (!entry) continue;
                     if ([ 'read', 'unread' ].includes(entry.readState)) continue;
 
+                    // eslint-disable-next-line no-shadow
                     const user = await this.client.resolveUser(entry.author).catch(this.client.logger.error.bind(this.client.logger));
                     const mem = await this.modmail.getMember(user.id).catch(this.client.logger.error.bind(this.client.logger));
                     if (!user) return reject(new Error(`Failed to find user`));
 
+                    // eslint-disable-next-line no-shadow
                     const embed = {
                         footer: {
                             text: user.id
@@ -201,7 +203,7 @@ class ChannelHandler {
             }
 
             // Ensure the right category
-            //if (channel.parentID !== this.newMail.id)
+            // if (channel.parentID !== this.newMail.id)
             await channel.edit({ parentID: this.newMail.id, lockPermissions: true }).catch((err) => {
                 this.client.logger.error(`Error during channel transition:\n${err.stack}`);
             });
@@ -221,7 +223,7 @@ class ChannelHandler {
      * @param {object} { age, count, force } age: how long the channel has to be without activity to be deleted, count: how many channels to act on, force: whether to ignore answered status
      * @memberof Modmail
      */
-    async sweepChannels({ age, count, force = false } = {}) {
+    async sweepChannels ({ age, count, force = false } = {}) {
 
         this.client.logger.info(`Sweeping graveyard`);
         const now = Date.now();
@@ -240,11 +242,11 @@ class ChannelHandler {
             if (!lastMessage || now - lastMessage.createdTimestamp > age || count && channelCount <= count) {
                 await channel.delete().then((ch) => {
                     const chCache = this.cache.channels;
-                    const _cached = Object.entries(chCache).find(([, val]) => {
+                    const _cached = Object.entries(chCache).find(([ , val ]) => {
                         return val === ch.id;
                     });
                     if (_cached) {
-                        const [userId] = _cached;
+                        const [ userId ] = _cached;
                         delete this.modmail.cache.channels[userId];
                     }
                 }).catch((err) => {
@@ -279,7 +281,7 @@ class ChannelHandler {
 
     }
 
-    async overflow() { // Overflows new modmail category into read 
+    async overflow () { // Overflows new modmail category into read 
         const channels = this.newMail.children.sort((a, b) => {
             if (!a.lastMessage) return -1;
             if (!b.lastMessage) return 1;

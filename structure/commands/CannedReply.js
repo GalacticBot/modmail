@@ -2,18 +2,18 @@ const Command = require('../Command');
 
 class CannedReply extends Command {
 
-    constructor(client) {
+    constructor (client) {
         super(client, {
             name: 'cannedreply',
-            aliases: ['cr', 'canned'],
+            aliases: [ 'cr', 'canned' ],
             showUsage: true,
             usage: `<canned response name>`
         });
     }
 
-    async execute(message, { args }) {
+    async execute (message, { args }) {
         
-        const [first] = args.map((a) => a);
+        const [ first ] = args.map((a) => a);
         // eslint-disable-next-line prefer-const
         let { channel, content, _caller } = message,
             anon = false;
@@ -22,13 +22,14 @@ class CannedReply extends Command {
         if (op === 'anon') {
             anon = true;
             content = content.replace(first, '');
-        } else if (['create', 'delete'].includes(op)) {
+        } else if ([ 'create', 'delete' ].includes(op)) {
             return this.createCanned(op, args, message);
-        } else if (['list'].includes(first.toLowerCase(op))) {
+        } else if ([ 'list' ].includes(first.toLowerCase(op))) {
 
             const list = Object.entries(this.client.modmail.replies);
             let str = '';
-            for (const [name, content] of list) {
+            // eslint-disable-next-line no-shadow
+            for (const [ name, content ] of list) {
                 if (str.length + content.length > 2000) {
                     await channel.send(str).catch(this.client.logger.error.bind(this.client.logger));
                     str = '';
@@ -42,13 +43,13 @@ class CannedReply extends Command {
 
     }
 
-    async createCanned(op, args, { channel, author }) {
+    async createCanned (op, args, { channel, author }) {
         
         if (args.length < 1) return {
             error: true,
             msg: 'Missing reply name'
         };
-        const [_name, ...rest] = args;
+        const [ _name, ...rest ] = args;
 
         const name = _name.toLowerCase();
         const canned = this.client.modmail.replies;
@@ -63,7 +64,7 @@ class CannedReply extends Command {
             if (canned[name]) {
                 confirmation = await this.client.prompt(`A canned reply by the name ${name} already exists, would you like to overwrite it?`, { channel, author });
                 if (!confirmation) return 'Timed out.';
-                confirmation = ['y', 'yes', 'ok'].includes(confirmation.content.toLowerCase());
+                confirmation = [ 'y', 'yes', 'ok' ].includes(confirmation.content.toLowerCase());
                 if (!confirmation) return 'Cancelled';
             }
 

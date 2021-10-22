@@ -1,11 +1,13 @@
 const fs = require('fs');
+const CacheHandler = require('./abstractions/CacheHandler');
 
-class Cache {
+class JsonCache extends CacheHandler {
 
-    constructor(client) {
+    constructor (client) {
+        
+        super(client);
 
         const opts = client._options;
-        this.client = client;
         this.logger = client.logger;
 
         this.saveInterval = opts.saveInterval;
@@ -23,7 +25,7 @@ class Cache {
 
     }
 
-    load() {
+    load () {
 
         if (this._ready) return;
 
@@ -31,27 +33,27 @@ class Cache {
             this.logger.info('Loading cache');
             const raw = JSON.parse(fs.readFileSync('./persistent_cache.json', { encoding: 'utf-8' }));
             const entries = Object.entries(raw);
-            for (const [key, val] of entries) this[key] = val;
+            for (const [ key, val ] of entries) this[key] = val;
         } else {
             this.logger.info('Cache file missing, creating...');
-            this.save();
+            this.savePersistentCache();
         }
 
-        this.cacheSaveInterval = setInterval(this.save.bind(this), 10 * 60 * 1000);
+        this.cacheSaveInterval = setInterval(this.savePersistentCache.bind(this), 10 * 60 * 1000);
         this.modmailSaveInterval = setInterval(this.saveModmailHistory.bind(this), this.saveInterval * 60 * 1000, this.client.modmail);
         this._ready = true;
 
     }
 
-    save() {
+    savePersistentCache () {
         this.logger.debug('Saving cache');
         fs.writeFileSync('./persistent_cache.json', JSON.stringify(this.json));
     }
 
-    saveModmailHistory() {
+    saveModmailHistory () {
 
         if (!this.updatedThreads.length) return;
-        const toSave = [...this.updatedThreads];
+        const toSave = [ ...this.updatedThreads ];
         this.updatedThreads = [];
         this.client.logger.debug(`Saving modmail data`);
         if (!fs.existsSync('./modmail_cache')) fs.mkdirSync('./modmail_cache');
@@ -67,7 +69,7 @@ class Cache {
 
     }
 
-    loadModmailHistory(userId) {
+    loadModmailHistory (userId) {
 
         return new Promise((resolve, reject) => {
 
@@ -90,7 +92,7 @@ class Cache {
 
     }
 
-    get json() {
+    get json () {
         return {
             queue: this.queue,
             channels: this.channels,
@@ -101,4 +103,4 @@ class Cache {
 
 }
 
-module.exports = Cache;
+module.exports = JsonCache;

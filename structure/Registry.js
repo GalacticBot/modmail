@@ -4,7 +4,7 @@ const fs = require('fs');
 
 class Registry {
 
-    constructor(client) {
+    constructor (client) {
 
         this.client = client;
 
@@ -12,13 +12,13 @@ class Registry {
 
     }
 
-    find(name) {
+    find (name) {
 
         return this.commands.find((c) => c.name === name.toLowerCase() || c.aliases?.includes(name.toLowerCase()));
 
     }
 
-    loadCommands() {
+    loadCommands () {
 
         const commandsDir = path.join(process.cwd(), 'structure', 'commands');
         const files = fs.readdirSync(commandsDir);

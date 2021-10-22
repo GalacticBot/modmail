@@ -10,7 +10,7 @@ const Cache = require('./Cache');
 
 class ModmailClient extends Client {
 
-    constructor(options) {
+    constructor (options) {
 
         super(options.clientOptions);
 
@@ -31,7 +31,7 @@ class ModmailClient extends Client {
 
     }
 
-    async init() {
+    async init () {
 
         this.registry.loadCommands();
 
@@ -51,13 +51,13 @@ class ModmailClient extends Client {
 
         process.on('exit', () => {
             this.logger.warn('process exiting');
-            this.cache.save();
+            this.cache.savePersistentCache();
             this.cache.saveModmailHistory(this.modmail);
         });
         process.on('SIGINT', () => {
             this.logger.warn('received sigint');
-            //this.cache.save();
-            //this.cache.saveModmailHistory(this.modmail);
+            // this.cache.save();
+            // this.cache.saveModmailHistory(this.modmail);
             // eslint-disable-next-line no-process-exit
             process.exit();
         });
@@ -66,7 +66,7 @@ class ModmailClient extends Client {
 
     }
 
-    ready() {
+    ready () {
 
         return new Promise((resolve) => {
             if (this._ready) resolve();
@@ -75,7 +75,7 @@ class ModmailClient extends Client {
 
     }
 
-    async handleMessage(message) {
+    async handleMessage (message) {
 
         if (!this._ready) return;
         if (message.author.bot) return;
@@ -90,13 +90,13 @@ class ModmailClient extends Client {
 
         const { prefix } = this;
         const { channel, guild, content, member } = message;
-        if (![this.mainServer.id, this.bansServer?.id || '0'].includes(guild.id)) return;
+        if (![ this.mainServer.id, this.bansServer?.id || '0' ].includes(guild.id)) return;
         if (!content || !content.startsWith(prefix)) return;
 
         const roles = member.roles.cache.map((r) => r.id);
-        if(!roles.some((r) => this._options.staffRoles.includes(r)) && !member.hasPermission('ADMINISTRATOR')) return;
+        if (!roles.some((r) => this._options.staffRoles.includes(r)) && !member.hasPermission('ADMINISTRATOR')) return;
 
-        const [rawCommand, ...args] = content.split(' ');
+        const [ rawCommand, ...args ] = content.split(' ');
         const commandName = rawCommand.substring(prefix.length);
         const command = this.registry.find(commandName);
         if (!command) return;
@@ -127,32 +127,32 @@ class ModmailClient extends Client {
 
     }
 
-    resolveUser(...args) {
+    resolveUser (...args) {
         return this.resolver.resolveUser(...args);
     }
 
-    resolveUsers(...args) {
+    resolveUsers (...args) {
         return this.resolver.resolveUsers(...args);
     }
 
-    resolveChannels(...args) {
+    resolveChannels (...args) {
         return this.resolver.resolveChannels(...args);
     }
 
-    resolveChannel(...args) {
+    resolveChannel (...args) {
         return this.resolver.resolveChannel(...args);
     }
 
-    async prompt(str, { author, channel, time }) {
+    async prompt (str, { author, channel, time }) {
 
         if (!channel && author) channel = await author.createDM();
         if (!channel) throw new Error(`Missing channel for prompt, must pass at least author.`);
         await channel.send(str);
-        return channel.awaitMessages((m) => m.author.id === author.id, { max: 1, time: time || 30000, errors: ['time'] })
+        return channel.awaitMessages((m) => m.author.id === author.id, { max: 1, time: time || 30000, errors: [ 'time' ] })
             .then((collected) => {
                 return collected.first();
             })
-            .catch((error) => { //eslint-disable-line no-unused-vars, handle-callback-err
+            .catch((error) => { // eslint-disable-line no-unused-vars, handle-callback-err
                 return null;
             });
 

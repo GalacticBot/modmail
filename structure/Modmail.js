@@ -6,7 +6,7 @@ class Modmail {
     // A lot of this can probably be simplified but I wrote all of this in 2 days and I cba to fix this atm
     // TODO: Fix everything
 
-    constructor(client) {
+    constructor (client) {
 
         this.client = client;
         this.cache = client.cache;
@@ -35,7 +35,7 @@ class Modmail {
 
     }
 
-    async init() {
+    async init () {
 
         this.mainServer = this.client.mainServer;
         if (!this.mainServer) throw new Error(`Missing main server`);
@@ -62,7 +62,7 @@ class Modmail {
         let logStr = `Started modmail handler for ${this.mainServer.name}`;
         if (this.bansServer) logStr += ` with ${this.bansServer.name} for ban appeals`;
         this.client.logger.info(logStr);
-        //this.client.logger.info(`Fetching messages from discord for modmail`);
+        // this.client.logger.info(`Fetching messages from discord for modmail`);
         // TODO: Fetch messages from discord in modmail channels
 
         this.channels.init();
@@ -70,16 +70,16 @@ class Modmail {
 
     }
 
-    async getMember(user) {
+    async getMember (user) {
 
         let result = this.mainServer.members.cache.get(user);
-        if(!result) result = await this.mainServer.members.fetch(user).catch(() => {
+        if (!result) result = await this.mainServer.members.fetch(user).catch(() => {
             return null;
         });
 
         if (!result && this.bansServer) {
             result = this.bansServer.members.cache.get(user);
-            if(!result) result = await this.bansServer.members.fetch(user).catch(() => {
+            if (!result) result = await this.bansServer.members.fetch(user).catch(() => {
                 return null;
             });
             if (result) result.inAppealServer = true;
@@ -89,7 +89,7 @@ class Modmail {
 
     }
 
-    async getUser(user) {
+    async getUser (user) {
 
         let result = this.client.users.cache.get(user);
         if (!result) result = await this.client.users.fetch(user).catch(() => {
@@ -99,7 +99,7 @@ class Modmail {
 
     }
 
-    async handleUser(message) {
+    async handleUser (message) {
 
         const { author, content } = message;
         const member = await this.getMember(author.id);
@@ -107,7 +107,7 @@ class Modmail {
 
         const now = Math.floor(Date.now() / 1000);
         const lastActivity = this.client.cache.lastActivity[author.id];
-        //console.log(now - lastActivity, lastActivity, now)
+        // console.log(now - lastActivity, lastActivity, now)
         if (!lastActivity || now - lastActivity > 30 * 60) {
             await author.send(`Thank you for your message, we'll get back to you soon!`);
         }
@@ -117,22 +117,18 @@ class Modmail {
 
         // Anti spam
         if (!this.spammers[author.id]) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
-        else {
-            if (this.spammers[author.id].timeout) {
-                if (now - this.spammers[author.id].start > 5 * 60) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
-                else return;
-            } else if (this.spammers[author.id].count > 5 && now - this.spammers[author.id].start < 15) {
-                this.spammers[author.id].timeout = true;
-                if (!this.spammers[author.id].warned) {
-                    this.spammers[author.id].warned = true;
-                    await author.send(`I've blocked you for spamming, please try again in 5 minutes`);
-                    if (cache._channels[author.id]) await cache._channels[author.id].send(`I've blocked ${author.tag} from DMing me as they were spamming.`);
-                }
-            } else {
-                if (now - this.spammers[author.id].start > 15) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
-                else this.spammers[author.id].count++;
+        else if (this.spammers[author.id].timeout) {
+            if (now - this.spammers[author.id].start > 5 * 60) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
+            else return;
+        } else if (this.spammers[author.id].count > 5 && now - this.spammers[author.id].start < 15) {
+            this.spammers[author.id].timeout = true;
+            if (!this.spammers[author.id].warned) {
+                this.spammers[author.id].warned = true;
+                await author.send(`I've blocked you for spamming, please try again in 5 minutes`);
+                if (cache._channels[author.id]) await cache._channels[author.id].send(`I've blocked ${author.tag} from DMing me as they were spamming.`);
             }
-        }
+        } else if (now - this.spammers[author.id].start > 15) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
+        else this.spammers[author.id].count++;
 
         const pastModmail = await this.cache.loadModmailHistory(author.id)
             .catch((err) => {
@@ -187,7 +183,7 @@ class Modmail {
 
     }
 
-    async sendCannedResponse({ message, responseName, anon }) {
+    async sendCannedResponse ({ message, responseName, anon }) {
 
         const content = this.getCanned(responseName);
         if (!content) return {
@@ -200,7 +196,7 @@ class Modmail {
     }
 
     // Send reply from channel
-    async sendResponse({ message, content, anon }) {
+    async sendResponse ({ message, content, anon }) {
 
         const { channel, member, author } = message;
         if (!this.categories.includes(channel.parentID)) return {
@@ -210,7 +206,7 @@ class Modmail {
 
         // Resolve target user from cache
         const chCache = this.cache.channels;
-        const result = Object.entries(chCache).find(([, val]) => {
+        const result = Object.entries(chCache).find(([ , val ]) => {
             return val === channel.id;
         });
 
@@ -220,7 +216,7 @@ class Modmail {
         };
 
         // Ensure target exists, this should never run into issues
-        const [userId] = result;
+        const [ userId ] = result;
         const targetMember = await this.getMember(userId);
         if (!targetMember) return {
             error: true,
@@ -234,7 +230,7 @@ class Modmail {
     }
 
     // Send modmail with the modmail command
-    async sendModmail({ message, content, anon, target }) {
+    async sendModmail ({ message, content, anon, target }) {
 
         const targetMember = await this.getMember(target.id);
         if (!targetMember) return {
@@ -254,7 +250,7 @@ class Modmail {
 
     }
 
-    async send({ target, staff, anon, content }) {
+    async send ({ target, staff, anon, content }) {
 
         const embed = {
             author: {
@@ -286,7 +282,7 @@ class Modmail {
 
     }
 
-    async changeReadState(message, args, state = 'read') {
+    async changeReadState (message, args, state = 'read') {
 
         const { author } = message;
 
@@ -301,14 +297,14 @@ class Modmail {
         if (args.length) {
 
             // Eventually support marking several threads read at the same time
-            const [id] = args;
+            const [ id ] = args;
             user = await this.client.resolveUser(id, true);
             let channel = await this.client.resolveChannel(id);
 
             if (channel) {
 
                 const chCache = this.cache.channels;
-                const result = Object.entries(chCache).find(([, val]) => {
+                const result = Object.entries(chCache).find(([ , val ]) => {
                     return val === channel.id;
                 });
 
@@ -334,7 +330,7 @@ class Modmail {
         if (!response) {
             const { channel } = message;
             const chCache = this.cache.channels;
-            const result = Object.entries(chCache).find(([, val]) => {
+            const result = Object.entries(chCache).find(([ , val ]) => {
                 return val === channel.id;
             });
 
@@ -343,7 +339,7 @@ class Modmail {
                 msg: `This doesn't seem to be a valid modmail channel. Cache might be out of sync. **[MISSING TARGET]**`
             };
 
-            const [userId] = result;
+            const [ userId ] = result;
             user = await this.getUser(userId);
             response = await this.channels.setReadState(userId, channel, author, state);
         }
@@ -355,7 +351,7 @@ class Modmail {
 
     }
 
-    async sendReminder() {
+    async sendReminder () {
 
         const channel = this.reminderChannel;
         const amount = this.queue.length;
@@ -379,7 +375,7 @@ class Modmail {
 
     }
 
-    async log({ author, content, action, target }) {
+    async log ({ author, content, action, target }) {
         
         const embed = {
             author: {
@@ -400,11 +396,11 @@ class Modmail {
 
     }
 
-    getCanned(name) {
+    getCanned (name) {
         return this.replies[name.toLowerCase()];
     }
 
-    loadReplies() {
+    loadReplies () {
 
         this.client.logger.info('Loading canned replies');
         if (!fs.existsSync('./canned_replies.json')) return {};
@@ -412,7 +408,7 @@ class Modmail {
 
     }
 
-    saveReplies() {
+    saveReplies () {
 
         this.client.logger.info('Saving canned replies');
         fs.writeFileSync('./canned_replies.json', JSON.stringify(this.replies));

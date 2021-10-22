@@ -1,6 +1,6 @@
 class Resolver {
 
-    constructor(client) {
+    constructor (client) {
         this.client = client;
     }
 
@@ -12,9 +12,9 @@ class Resolver {
      * @returns {Promise<Array<User>> || boolean} Array of resolved users or false if none were resolved
      * @memberof Resolver
      */
-    async resolveUsers(resolveables = [], strict = false) {
+    async resolveUsers (resolveables = [], strict = false) {
 
-        if (typeof resolveables === 'string') resolveables = [resolveables];
+        if (typeof resolveables === 'string') resolveables = [ resolveables ];
         if (resolveables.length === 0) return false;
         const { users } = this.client;
         const resolved = [];
@@ -23,7 +23,7 @@ class Resolver {
 
             if ((/<@!?([0-9]{17,21})>/u).test(resolveable)) {
 
-                const [, id] = resolveable.match(/<@!?([0-9]{17,21})>/u);
+                const [ , id ] = resolveable.match(/<@!?([0-9]{17,21})>/u);
                 const user = await users.fetch(id).catch((err) => {
                     if (err.code === 10013) return false;
                     // this.client.logger.warn(err); return false; 
@@ -33,7 +33,7 @@ class Resolver {
 
             } else if ((/(id:)?([0-9]{17,21})/u).test(resolveable)) {
 
-                const [, , id] = resolveable.match(/(id:)?([0-9]{17,21})/u);
+                const [ , , id ] = resolveable.match(/(id:)?([0-9]{17,21})/u);
                 const user = await users.fetch(id).catch((err) => {
                     if (err.code === 10013) return false;
                     // this.client.logger.warn(err); return false; 
@@ -63,11 +63,11 @@ class Resolver {
 
     }
 
-    async resolveUser(resolveable, strict) {
+    async resolveUser (resolveable, strict) {
 
         if (!resolveable) return false;
         if (resolveable instanceof Array) throw new Error('Resolveable cannot be of type Array, use resolveUsers for resolving arrays of users');
-        const result = await this.resolveUsers([resolveable], strict);
+        const result = await this.resolveUsers([ resolveable ], strict);
         return result ? result[0] : false;
 
     }
@@ -82,9 +82,9 @@ class Resolver {
      * @returns {Promise<Array<GuildChannel>> || Promise<Boolean>} an array of guild channels or false if none were resolved
      * @memberof Resolver
      */
-    async resolveChannels(resolveables = [], strict = false, guild = null, filter = () => true) {
+    async resolveChannels (resolveables = [], strict = false, guild = null, filter = () => true) {
 
-        if (typeof resolveables === 'string') resolveables = [resolveables];
+        if (typeof resolveables === 'string') resolveables = [ resolveables ];
         if (resolveables.length === 0) return false;
         if (!guild) guild = this.client.mainServer;
         const CM = guild.channels;
@@ -102,9 +102,10 @@ class Resolver {
 
             if (id.test(resolveable)) {
                 const match = resolveable.match(id);
-                const [, ch] = match;
+                const [ , ch ] = match;
 
-                const channel = await this.client.channels.fetch(ch).catch((e) => { }); //eslint-disable-line no-empty, no-empty-function, no-unused-vars
+                // eslint-disable-next-line no-shadow
+                const channel = await this.client.channels.fetch(ch).catch((e) => { }); // eslint-disable-line no-empty, no-empty-function, no-unused-vars
 
                 if (channel && filter(channel)) resolved.push(channel);
 
@@ -112,6 +113,7 @@ class Resolver {
                 const match = resolveable.match(name);
                 const ch = match[1].toLowerCase();
 
+                // eslint-disable-next-line no-shadow
                 const channel = CM.cache.sort((a, b) => a.name.length - b.name.length).filter(filter).filter((c) => {
                     if (!strict) return c.name.toLowerCase().includes(ch);
                     return c.name.toLowerCase() === ch;
@@ -127,11 +129,11 @@ class Resolver {
 
     }
 
-    async resolveChannel(resolveable, strict, guild, filter) {
+    async resolveChannel (resolveable, strict, guild, filter) {
 
         if (!resolveable) return false;
         if (resolveable instanceof Array) throw new Error('Resolveable cannot be of type Array, use resolveChannels for resolving arrays of channels');
-        const result = await this.resolveChannels([resolveable], strict, guild, filter);
+        const result = await this.resolveChannels([ resolveable ], strict, guild, filter);
         return result ? result[0] : false;
 
     }

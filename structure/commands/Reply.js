@@ -2,18 +2,18 @@ const Command = require('../Command');
 
 class Reply extends Command {
 
-    constructor(client) {
+    constructor (client) {
         super(client, {
             name: 'reply',
-            aliases: ['r'],
+            aliases: [ 'r' ],
             showUsage: true,
             usage: `<reply content>`
         });
     }
 
-    async execute(message, { args }) {
+    async execute (message, { args }) {
 
-        const [first] = args.map((a) => a);
+        const [ first ] = args.map((a) => a);
         // eslint-disable-next-line prefer-const
         let { content, _caller } = message, 
             anon = false;

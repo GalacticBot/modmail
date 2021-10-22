@@ -2,13 +2,13 @@ const Command = require('../Command');
 
 class Ping extends Command {
 
-    constructor(client) {
+    constructor (client) {
         super(client, {
             name: 'ping'
         });
     }
 
-    async execute() {
+    async execute () {
         return `PONG!`;
     }
 
