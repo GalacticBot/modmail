@@ -23,7 +23,7 @@ class Modmail extends Command {
             anon = true;
             content = content.replace(first, '');
             first = second;
-        } else if (second.toLowerCase() === 'anon') {
+        } else if (second?.toLowerCase() === 'anon') {
             anon = true;
             content = content.replace(second, '');
         }
