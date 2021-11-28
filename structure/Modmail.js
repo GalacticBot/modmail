@@ -225,7 +225,7 @@ class Modmail {
 
         this.log({ author, action: `${author.tag} replied to ${targetMember.user.tag}`, content, target: targetMember.user });
         await message.delete().catch(this.client.logger.warn.bind(this.client.logger));
-        return this.send({ target: targetMember, staff: member, content, anon });
+        return this.send({ target: targetMember, staff: member, content, anon }).catch((err) => this.client.logger.error(`Error during Modmail.send:\n${err.stack}`));
 
     }
 
@@ -241,11 +241,11 @@ class Modmail {
         const { member: staff, author } = message;
 
         // Send to channel in server & target
-        const sent = await this.send({ target: targetMember, staff, anon, content });
+        const sent = await this.send({ target: targetMember, staff, anon, content }).catch((err) => this.client.logger.error(`Error during Modmail.sendModmail:\n${err.stack}`));
         if (sent.error) return sent;
 
         // Inline response
-        await message.channel.send('Delivered.').catch(this.client.logger.error.bind(this.client.logger));
+        await message.channel.send('Delivered.').catch((err) => this.client.logger.error(`Error during Modmail.sendModmail:\n${err.stack}`));
         this.log({ author, action: `${author.tag} sent a message to ${targetMember.user.tag}`, content, target: targetMember.user });
 
     }
@@ -367,7 +367,7 @@ class Modmail {
         const str = `${amount} modmail in queue.`;
         this.client.logger.debug(`Sending modmail reminder, #mm: ${amount}`);
         if (this.lastReminder) {
-            if (channel.lastMessage.id === this.lastReminder.id) return this.lastReminder.edit(str);
+            if (channel.lastMessage?.id === this.lastReminder?.id) return this.lastReminder.edit(str);
             await this.lastReminder.delete();
         }
         this.lastReminder = await channel.send(str);
@@ -392,7 +392,7 @@ class Modmail {
             };
         }
 
-        this.logChannel.send({ embed }).catch(this.client.logger.error.bind(this.client.logger));
+        this.logChannel.send({ embed }).catch((err) => this.client.logger.error(`Error during logging of modmail:\n${err.stack}`));
 
     }
 
