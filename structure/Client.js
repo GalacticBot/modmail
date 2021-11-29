@@ -117,8 +117,8 @@ class ModmailClient extends Client {
 
         this.logger.debug(`${message.author.tag} is executing command ${command.name}`);
         const clean = message.content.replace(`${this.prefix}${commandName}`, '').trim();
-        const result = await command.execute(message, { args, clean }).catch((err) => {
-            this.logger.error(`Command ${command.name} errored during execution:\nARGS: [${args.join(', ')}]\n${err.stack}`);
+        const result = await command.execute(message, { args: [ ...args ], clean }).catch((err) => {
+            this.logger.error(`Command ${command.name} errored during execution:\nARGS: [ "${args.join('", "')}" ]\n${err.stack}`);
             return {
                 error: true,
                 msg: `Command ${command.name} ran into an error during execution. This has been logged.`
