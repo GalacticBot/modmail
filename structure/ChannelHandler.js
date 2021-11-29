@@ -157,7 +157,7 @@ class ChannelHandler {
                     inline: false
                 });
 
-                await channel.send({ embed });
+                await channel.send({ embed }).catch(err => this.client.logger.error(`ChannelHandler.load errored at channel.send:\n${err.stack}`));
 
                 // Load in context
                 const len = history.length;
@@ -194,7 +194,7 @@ class ChannelHandler {
                         value: entry.attachments.join('\n').substring(0, 1000)
                     });
 
-                    await channel.send({ embed });
+                    await channel.send({ embed }).catch(err => this.client.logger.error(`ChannelHandler.load errored at channel.send:\n${err.stack}`));
 
                 }
 

@@ -62,6 +62,10 @@ class ModmailClient extends Client {
             process.exit();
         });
 
+        process.on('unhandledRejection', (reason, prom) => {
+            this.logger.error(`Unhandled promise rejection at: ${prom}\nReason: ${reason}`);
+        });
+
         this._ready = true;
 
     }
@@ -106,13 +110,14 @@ class ModmailClient extends Client {
 
             let helpStr = `**${command.name}**\nUsage: ${this.prefix}${command.name} ${command.usage}`;
             if (command.aliases) helpStr += `\nAliases: ${command.aliases.join(', ')}`;
-            return channel.send(helpStr).catch(this.logger.error.bind(this.logger));
+            return channel.send(helpStr).catch(err => this.client.logger.error(`Client.handleMessage errored at channel.send:\n${err.stack}`));
 
         }
 
         this.logger.debug(`${message.author.tag} is executing command ${command.name}`);
-        const result = await command.execute(message, { args, clean: message.content.replace(`${this.prefix}${commandName}`, '').trim() }).catch((err) => {
-            this.logger.error(`Command ${command.name} errored during execution:\n${err.stack}`);
+        const clean = message.content.replace(`${this.prefix}${commandName}`, '').trim();
+        const result = await command.execute(message, { args, clean }).catch((err) => {
+            this.logger.error(`Command ${command.name} errored during execution:\nARGS: [${args.join(', ')}]\n${err.stack}`);
             return {
                 error: true,
                 msg: `Command ${command.name} ran into an error during execution. This has been logged.`
@@ -121,9 +126,9 @@ class ModmailClient extends Client {
 
         if (!result) return;
         
-        if (result.error) return channel.send(result.msg).catch(this.logger.error.bind(this.logger));
-        else if (result.response) return channel.send(result.response).catch(this.logger.error.bind(this.logger));
-        else if (typeof result === 'string') return channel.send(result).catch(this.logger.error.bind(this.logger));
+        if (result.error) return channel.send(result.msg).catch(err => this.client.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
+        else if (result.response) return channel.send(result.response).catch(err => this.client.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
+        else if (typeof result === 'string') return channel.send(result).catch(err => this.client.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
 
     }
 
@@ -147,7 +152,7 @@ class ModmailClient extends Client {
 
         if (!channel && author) channel = await author.createDM();
         if (!channel) throw new Error(`Missing channel for prompt, must pass at least author.`);
-        await channel.send(str);
+        await channel.send(str).catch(err => this.client.logger.error(`Client.prompt errored at channel.send:\n${err.stack}`));
         return channel.awaitMessages((m) => m.author.id === author.id, { max: 1, time: time || 30000, errors: [ 'time' ] })
             .then((collected) => {
                 return collected.first();
