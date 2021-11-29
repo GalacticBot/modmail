@@ -67,6 +67,7 @@ class ModmailClient extends Client {
         });
 
         this._ready = true;
+        await this.modmail.reminderChannel.send(`Modmail bot booted and ready.`);
 
     }
 

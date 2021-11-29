@@ -45,9 +45,15 @@ class Logs extends Command {
         for (const entry of page.items) {
             // eslint-disable-next-line no-shadow
             const user = await this.client.resolveUser(entry.author);
+            let value = entry.content.substring(0, 1000) + (entry.content.length > 1000 ? '...' : '');
+            if (!value.length) value = entry.attachments.join('\n');
             embed.fields.push({
                 name: `${user.tag}${entry.anon ? ' (ANON)' : ''} @ ${new Date(entry.timestamp).toUTCString()}`,
-                value: entry.content.substring(0, 1000) + (entry.content.length > 1000 ? '...' : '') 
+                value 
+            });
+            if (entry.attachments?.length && entry.content.length) embed.fields.push({
+                name: `Attachments`,
+                value: entry.attachments.join('\n')
             });
         }
 

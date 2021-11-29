@@ -371,7 +371,7 @@ class Modmail {
             await this.lastReminder.delete();
         }
         this.lastReminder = await channel.send(str);
-        this.cache.lastReminder = this.lastReminder.id;
+        this.cache.misc.lastReminder = this.lastReminder.id;
 
     }
 
