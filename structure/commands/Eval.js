@@ -19,7 +19,7 @@ class Eval extends Command {
         
         try {
             let evaled = eval(clean); // eslint-disable-line no-eval
-            if (evaled instanceof Promise) await evaled;
+            if (evaled instanceof Promise) evaled = await evaled;
             if (typeof evaled !== 'string') evaled = inspect(evaled);
 
             evaled = evaled
