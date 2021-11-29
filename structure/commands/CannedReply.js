@@ -31,12 +31,12 @@ class CannedReply extends Command {
             // eslint-disable-next-line no-shadow
             for (const [ name, content ] of list) {
                 if (str.length + content.length > 2000) {
-                    await channel.send(str).catch(err => this.client.logger.error(`CannedReply.execute errored at channel.send:\n${err.stack}`));
+                    await channel.send(str); // .catch(err => this.client.logger.error(`CannedReply.execute errored at channel.send:\n${err.stack}`));
                     str = '';
                 }
                 str += `**${name}:** ${content}\n`;
             }
-            if (str.length) return channel.send(str).catch(err => this.client.logger.error(`CannedReply.execute errored at channel.send:\n${err.stack}`));
+            if (str.length) return channel.send(str); // .catch(err => this.client.logger.error(`CannedReply.execute errored at channel.send:\n${err.stack}`));
             return '**__None__**';
         }
         return this.client.modmail.sendCannedResponse({ message, responseName: content.trim(), anon });
