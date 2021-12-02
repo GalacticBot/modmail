@@ -111,7 +111,7 @@ class ModmailClient extends Client {
 
             let helpStr = `**${command.name}**\nUsage: ${this.prefix}${command.name} ${command.usage}`;
             if (command.aliases) helpStr += `\nAliases: ${command.aliases.join(', ')}`;
-            return channel.send(helpStr).catch(err => this.client.logger.error(`Client.handleMessage errored at channel.send:\n${err.stack}`));
+            return channel.send(helpStr).catch(err => this.logger.error(`Client.handleMessage errored at channel.send:\n${err.stack}`));
 
         }
 
@@ -127,9 +127,9 @@ class ModmailClient extends Client {
 
         if (!result) return;
         
-        if (result.error) return channel.send(result.msg).catch(err => this.client.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
-        else if (result.response) return channel.send(result.response).catch(err => this.client.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
-        else if (typeof result === 'string') return channel.send(result).catch(err => this.client.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
+        if (result.error) return channel.send(result.msg).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
+        else if (result.response) return channel.send(result.response).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
+        else if (typeof result === 'string') return channel.send(result).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
 
     }
 
@@ -153,7 +153,7 @@ class ModmailClient extends Client {
 
         if (!channel && author) channel = await author.createDM();
         if (!channel) throw new Error(`Missing channel for prompt, must pass at least author.`);
-        await channel.send(str).catch(err => this.client.logger.error(`Client.prompt errored at channel.send:\n${err.stack}`));
+        await channel.send(str).catch(err => this.logger.error(`Client.prompt errored at channel.send:\n${err.stack}`));
         return channel.awaitMessages((m) => m.author.id === author.id, { max: 1, time: time || 30000, errors: [ 'time' ] })
             .then((collected) => {
                 return collected.first();
