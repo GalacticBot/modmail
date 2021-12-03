@@ -1,3 +1,4 @@
+const { inspect } = require('util');
 const { Client } = require('discord.js');
 
 // eslint-disable-next-line no-unused-vars
@@ -127,9 +128,9 @@ class ModmailClient extends Client {
 
         if (!result) return;
         
-        if (result.error) return channel.send(result.msg).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
-        else if (result.response) return channel.send(result.response).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
-        else if (typeof result === 'string') return channel.send(result).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}`));
+        if (result.error) return channel.send(result.msg).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}\n${inspect(result)}`));
+        else if (result.response) return channel.send(result.response).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}\n${inspect(result)}`));
+        else if (typeof result === 'string') return channel.send(result).catch(err => this.logger.error(`Client.load errored at channel.send:\n${err.stack}\n${inspect(result)}`));
 
     }
 
