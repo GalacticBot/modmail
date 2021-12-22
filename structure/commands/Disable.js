@@ -1,4 +1,5 @@
 const Command = require('../Command');
+const Util = require('../Util');
 
 class Ping extends Command {
 
@@ -9,7 +10,12 @@ class Ping extends Command {
         });
     }
 
-    async execute ({ _caller }, { clean }) {
+    async execute ({ author, member, _caller }, { clean }) {
+        
+
+        const { sudo } = this.client._options;
+        const roleIds = member.roles.cache.map(r => r.id);
+        if (!Util.arrayIncludesAny(roleIds, sudo) && !sudo.includes(author.id)) return;
 
         if (_caller === 'enable') this.client.modmail.enable();
         else this.client.modmail.disable(clean);

@@ -13,7 +13,7 @@ module.exports = {
     readInactive: 30, // How long a channel should be inactive for in the read category before moving to graveyard
     channelSweepInterval: 10, // How often channel transitions should be processed in minutes
     saveInterval: 1, // How often modmail history should be written to file in minutes
-    evalAccess: [], // Array of IDs that should have access to the bot's eval function
+    sudo: [], // Array of IDs (user or role) that have elevated access to the bot, i.e. eval, disable and any other elevated permission commands
     anonColor: 0, // A colour value, 0 will default to the bot's highest coloured role
     modmailReminderInterval: 10, // How often the bot should send a reminder of x new modmails in queue
     modmailReminderChannel: '', // channel to send reminders in
@@ -32,7 +32,7 @@ module.exports = {
         }
     },
     loggerOptions: { // This is for logging errors to a discord webhook 
-        webhook: {   // If you're not using the webhook, disable it
+        webhook: { // If you're not using the webhook, disable it
             disabled: true,
             id: '',
             token: ''

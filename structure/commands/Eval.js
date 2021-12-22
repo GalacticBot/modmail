@@ -2,6 +2,7 @@ const { inspect } = require('util');
 const { username } = require('os').userInfo();
 
 const Command = require('../Command');
+const Util = require('../Util');
 
 class Eval extends Command {
 
@@ -14,8 +15,10 @@ class Eval extends Command {
 
     async execute (message, { clean }) {
 
-        if (!this.client._options.evalAccess.includes(message.author.id)) return;
+        const { sudo } = this.client._options;
         const { guild, author, member, client, channel } = message; // eslint-disable-line no-unused-vars
+        const roleIds = member.roles.cache.map(r => r.id);
+        if (!Util.arrayIncludesAny(roleIds, sudo) && !sudo.includes(author.id)) return;
         
         try {
             let evaled = eval(clean); // eslint-disable-line no-eval

@@ -1,4 +1,5 @@
 const Command = require('../Command');
+const Util = require('../Util');
 
 class Logs extends Command {
 
@@ -27,7 +28,7 @@ class Logs extends Command {
         const { member, channel } = message;
         const history = await this.client.cache.loadModmailHistory(user.id);
         if (!history.length) return 'Not found in modmail DB';
-        const page = this.paginate([ ...history ].filter((e) => !('readState' in e)).reverse(), pageNr, 10);
+        const page = Util.paginate([ ...history ].filter((e) => !('readState' in e)).reverse(), pageNr, 10);
 
         const embed = {
             author: {
@@ -59,19 +60,6 @@ class Logs extends Command {
 
         await channel.send({ embed });
 
-    }
-
-    paginate (items, page = 1, pageLength = 10) {
-        const maxPage = Math.ceil(items.length / pageLength);
-        if (page < 1) page = 1;
-        if (page > maxPage) page = maxPage;
-        const startIndex = (page - 1) * pageLength;
-        return {
-            items: items.length > pageLength ? items.slice(startIndex, startIndex + pageLength) : items,
-            page,
-            maxPage,
-            pageLength
-        };
     }
 
 }
