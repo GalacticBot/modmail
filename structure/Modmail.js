@@ -29,6 +29,8 @@ class Modmail {
         this.replies = {};
 
         this.lastReminder = null;
+        this.disabled = false;
+        this.disabledReason = null;
 
         this.channels = new ChannelHandler(this, opts);
         this._ready = false;
@@ -64,6 +66,9 @@ class Modmail {
         this.client.logger.info(logStr);
         // this.client.logger.info(`Fetching messages from discord for modmail`);
         // TODO: Fetch messages from discord in modmail channels
+
+        this.disabled = this.cache.misc.disabled || false;
+        this.disabledReason = this.cache.misc.disabledReason || null;
 
         this.channels.init();
         this._ready = true;
@@ -129,6 +134,13 @@ class Modmail {
             }
         } else if (now - this.spammers[author.id].start > 15) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
         else this.spammers[author.id].count++;
+
+        if (this.disabled) {
+            let reason = `Modmail has been disabled for the time being`;
+            if (this.disabledReason) reason += ` for the following reason:\n\n${this.disabledReason}`;
+            else reason += `.`;
+            return author.send(reason);
+        }
 
         const pastModmail = await this.cache.loadModmailHistory(author.id)
             .catch((err) => {
@@ -413,6 +425,22 @@ class Modmail {
         this.client.logger.info('Saving canned replies');
         fs.writeFileSync('./canned_replies.json', JSON.stringify(this.replies));
 
+    }
+
+    disable (reason) {
+        this.disabled = true;
+        if (reason) this.disabledReason = reason;
+        else this.disabledReason = null;
+
+        this.cache.misc.disabled = true;
+        this.cache.misc.disabledReason = this.disabledReason;
+        this.cache.savePersistentCache();
+    }
+
+    enable () {
+        this.disabled = false;
+        this.cache.misc.disabled = false;
+        this.cache.savePersistentCache();
     }
 
 }
