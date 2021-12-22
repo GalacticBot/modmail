@@ -111,15 +111,8 @@ class Modmail {
         if (!member) return; // No member object found in main or bans server?
 
         const now = Math.floor(Date.now() / 1000);
-        const lastActivity = this.client.cache.lastActivity[author.id];
-        // console.log(now - lastActivity, lastActivity, now)
-        if (!lastActivity || now - lastActivity > 30 * 60) {
-            await author.send(`Thank you for your message, we'll get back to you soon!`);
-        }
-        this.client.cache.lastActivity[author.id] = now;
-
-        const { cache } = this.client;
-
+        const { cache } = this;
+        
         // Anti spam
         if (!this.spammers[author.id]) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
         else if (this.spammers[author.id].timeout) {
@@ -134,6 +127,12 @@ class Modmail {
             }
         } else if (now - this.spammers[author.id].start > 15) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
         else this.spammers[author.id].count++;
+
+        const lastActivity = this.cache.lastActivity[author.id];
+        if (!lastActivity || now - lastActivity > 30 * 60) {
+            await author.send(`Thank you for your message, we'll get back to you soon!`);
+        }
+        this.cache.lastActivity[author.id] = now;
 
         if (this.disabled) {
             let reason = `Modmail has been disabled for the time being`;
