@@ -34,7 +34,7 @@ class Registry {
             }
 
             const command = new commandClass(this.client);
-            if (this.commands.has(command.name)) this.client.logger(`Command by name ${command.name} already exists, skipping duplicate at path ${commandPath}`);
+            if (this.commands.has(command.name)) this.client.logger.warn(`Command by name ${command.name} already exists, skipping duplicate at path ${commandPath}`);
             else this.commands.set(command.name, command);
 
         }

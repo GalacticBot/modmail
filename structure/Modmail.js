@@ -113,26 +113,26 @@ class Modmail {
         const now = Math.floor(Date.now() / 1000);
         const { cache } = this;
         
-        // Anti spam
-        if (!this.spammers[author.id]) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
-        else if (this.spammers[author.id].timeout) {
+        // Anti spam -- never seen user
+        if (!this.spammers[author.id]) this.spammers[author.id] = {
+            start: now, // when counting started
+            count: 1, // # messages
+            timeout: false, // timed out?
+            warned: false // warned?
+        };
+        else if (this.spammers[author.id].timeout) { // User was timed out, check if 5 minutes have passsed, if so, reset their timeout else ignore them
             if (now - this.spammers[author.id].start > 5 * 60) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
             else return;
         } else if (this.spammers[author.id].count > 5 && now - this.spammers[author.id].start < 15) {
+            // Has sent more than 5 messages in less than 15 seconds at this point, time them out
             this.spammers[author.id].timeout = true;
-            if (!this.spammers[author.id].warned) {
+            if (!this.spammers[author.id].warned) { // Let them know they've been timed out, toggle the warned property so it doesn't send the warning every time
                 this.spammers[author.id].warned = true;
                 await author.send(`I've blocked you for spamming, please try again in 5 minutes`);
                 if (cache._channels[author.id]) await cache._channels[author.id].send(`I've blocked ${author.tag} from DMing me as they were spamming.`);
             }
-        } else if (now - this.spammers[author.id].start > 15) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false };
+        } else if (now - this.spammers[author.id].start > 15) this.spammers[author.id] = { start: now, count: 1, timeout: false, warned: false }; // Enough time has passed, reset the object
         else this.spammers[author.id].count++;
-
-        const lastActivity = this.cache.lastActivity[author.id];
-        if (!lastActivity || now - lastActivity > 30 * 60) {
-            await author.send(`Thank you for your message, we'll get back to you soon!`);
-        }
-        this.cache.lastActivity[author.id] = now;
 
         if (this.disabled) {
             let reason = `Modmail has been disabled for the time being`;
@@ -140,6 +140,12 @@ class Modmail {
             else reason += `.`;
             return author.send(reason);
         }
+
+        const lastActivity = this.cache.lastActivity[author.id];
+        if (!lastActivity || now - lastActivity > 30 * 60) { // No point in sending this for *every* message
+            await author.send(`Thank you for your message, we'll get back to you soon!`);
+        }
+        this.cache.lastActivity[author.id] = now;
 
         const pastModmail = await this.cache.loadModmailHistory(author.id)
             .catch((err) => {

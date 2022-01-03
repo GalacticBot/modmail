@@ -15,7 +15,7 @@
     "nodemon": "^2.0.7"
   },
   "dependencies": {
-    "chalk": "^4.1.1",
+    "chalk": "^5.0.0",
     "diagnostics": "^2.0.2",
     "discord.js": "^12.5.3",
     "moment": "^2.29.1",
