@@ -3,4 +3,5 @@ WORKDIR /modmail
 COPY . .
 RUN yarn install --production
 VOLUME [ "/modmail/modmail_cache" ]
-CMD ["node", "index.js"]
+ENTRYPOINT [ "/bin/ash" ]
+# CMD ["node", "index.js"]

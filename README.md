@@ -6,10 +6,24 @@ Uses json for storage. If this is a problem, feel free to start a branch and wri
 Shouldn't require much setup, fill in the relevant fields in config.js, should be well commented.
 
 I've tried refactoring some of the original code that I wrote initially in haste, but a lot of it's still very questionable and in need of rewriting/refactoring.
-Contributions welcome.
+Contributions welcome.  
+
+## Docker image  
+**Highly recommend making a named volume for the storage**
+> Create a named volume `docker volume create ModmailStorage`
+Make sure to have a config.js ready to go, see the example file for a template
+> Start the container  
+```
+docker run -d --name modmail \
+-v /path/to/config.js:/modmail/config.js \
+-v ModmailStorage:/modmail/modmail_cache \
+navydotgif/modmail:latest
+```
 
 ## How to use
 > Install [Node.js](https://nodejs.org/en/download/), at least v12, though I'd recommend at least 14 due to Discord.js requiring it in v13.
+
+> Run `git clone https://github.com/GalacticBot/modmail.git`
 
 > Run `yarn install`, alternatively `npm install` if you don't have yarn for some reason.
 

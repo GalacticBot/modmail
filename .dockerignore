@@ -4,6 +4,7 @@ old.eslintrc.js
 
 node_modules
 
+modmail_cache
 canned_replies.json
 persistent_cache.json
 config.js
