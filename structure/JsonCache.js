@@ -92,9 +92,11 @@ class JsonCache extends CacheHandler {
 
     }
 
-    verifyQueue () {
+    async verifyQueue () {
+        
         this.client.logger.info(`Verifying modmail queue.`);
-        this.queue.forEach(async entry => {
+
+        for (const entry of this.queue) {
             const path = `./modmail_cache/${entry}.json`;
             if (fs.existsSync(path)) return;
 
@@ -105,11 +107,16 @@ class JsonCache extends CacheHandler {
             messages = messages.filter(msg => msg.author.id !== this.client.user.id).sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
             const history = await this.loadModmailHistory(entry);
-            for (const { author, content, createdTimestamp, attachments } of messages) history.push({ attachments: attachments.map(att => att.url), author: author.id, content, timestamp: createdTimestamp });
+            for (const { author, content, createdTimestamp, attachments } of messages.values()) {
+                history.push({ attachments: attachments.map(att => att.url), author: author.id, content, timestamp: createdTimestamp });
+            }
+            this.updatedThreads.push(entry);
 
-        });
+        }
 
         this.client.logger.info(`Queue verified.`);
+        this.saveModmailHistory();
+
     }
 
     get json () {

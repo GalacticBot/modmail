@@ -64,7 +64,7 @@ class ModmailClient extends Client {
         });
 
         process.on('unhandledRejection', (reason, prom) => {
-            this.logger.error(`Unhandled promise rejection at: ${prom}\nReason: ${reason}`);
+            this.logger.error(`Unhandled promise rejection at: ${inspect(prom)}\nReason: ${reason}`);
         });
 
         this._ready = true;
