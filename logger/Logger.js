@@ -17,17 +17,17 @@ const Constants = {
 
 class Logger {
 
-    constructor(client, options) {
+    constructor (client, options) {
         this.client = client;
         this.options = options;
 
         const transports = [
-            new FileExtension({ filename: `logs/${this.date.split(' ')[0]}.log`, level: 'debug' }), //Will NOT log "silly" logs, could change in future.
+            new FileExtension({ filename: `logs/${this.date.split(' ')[0]}.log`, level: 'debug' }), // Will NOT log "silly" logs, could change in future.
             new FileExtension({ filename: `logs/errors/${this.date.split(' ')[0]}-error.log`, level: 'error' }),
-            new Console({ level: 'silly' }) //Will log EVERYTHING.
+            new Console({ level: 'silly' }) // Will log EVERYTHING.
         ];
 
-        if (!options.webhook.disabled) transports.push(new DiscordWebhook({ level: 'error', ...options.webhook })); //Broadcast errors to a discord webhook.
+        if (!options.webhook.disabled) transports.push(new DiscordWebhook({ level: 'error', ...options.webhook })); // Broadcast errors to a discord webhook.
 
         this.logger = createLogger({
             levels: config.npm.levels,
@@ -38,11 +38,11 @@ class Logger {
             transports
         });
 
-        //TODO: Add proper date-oriented filenames and add a daily rotation file (?).
+        // TODO: Add proper date-oriented filenames and add a daily rotation file (?).
 
     }
 
-    write(type = 'silly', string = '') {
+    write (type = 'silly', string = '') {
 
         const color = Constants.Colors[type];
         const header = `${chalk[color](`[${this.date}][modmail]`)}`;
@@ -52,23 +52,23 @@ class Logger {
 
     }
 
-    get date() {
+    get date () {
         return moment().format("YYYY-MM-DD hh:mm:ss");
     }
 
-    info(message) {
+    info (message) {
         this.write('info', message);
     }
 
-    warn(message) {
+    warn (message) {
         this.write('warn', message);
     }
 
-    error(message) {
+    error (message) {
         this.write('error', message);
     }
 
-    debug(message) {
+    debug (message) {
         this.write('debug', message);
     }
 
