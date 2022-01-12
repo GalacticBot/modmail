@@ -92,6 +92,26 @@ class JsonCache extends CacheHandler {
 
     }
 
+    verifyQueue () {
+        this.client.logger.info(`Verifying modmail queue.`);
+        this.queue.forEach(async entry => {
+            const path = `./modmail_cache/${entry}.json`;
+            if (fs.existsSync(path)) return;
+
+            this.client.logger.warn(`User ${entry} is in queue but is missing history. Attempting to recover history.`);
+            const user = await this.client.resolveUser(entry);
+            const dm = await user.createDM();
+            let messages = await dm.messages.fetch();
+            messages = messages.filter(msg => msg.author.id !== this.client.user.id).sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+
+            const history = await this.loadModmailHistory(entry);
+            for (const { author, content, createdTimestamp, attachments } of messages) history.push({ attachments: attachments.map(att => att.url), author: author.id, content, timestamp: createdTimestamp });
+
+        });
+
+        this.client.logger.info(`Queue verified.`);
+    }
+
     get json () {
         return {
             queue: this.queue,

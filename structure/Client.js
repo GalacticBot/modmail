@@ -7,7 +7,7 @@ const { Logger } = require('../logger');
 const Modmail = require('./Modmail');
 const Registry = require('./Registry');
 const Resolver = require('./Resolver');
-const Cache = require('./Cache');
+const Cache = require('./JsonCache');
 
 class ModmailClient extends Client {
 

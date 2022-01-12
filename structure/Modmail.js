@@ -370,6 +370,8 @@ class Modmail {
 
     async sendReminder () {
 
+        await this.cache.verifyQueue();
+
         const channel = this.reminderChannel;
         const amount = this.queue.length;
 

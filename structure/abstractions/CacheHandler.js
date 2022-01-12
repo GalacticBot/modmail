@@ -22,6 +22,10 @@ class CacheHandler {
         throw new Error('Not implemented');
     }
 
+    verifyQueue () {
+        throw new Error('Not implemented');
+    }
+
     get json () {
         return {
             queue: this.queue,
