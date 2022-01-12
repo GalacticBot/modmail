@@ -98,16 +98,34 @@ class JsonCache extends CacheHandler {
 
         for (const entry of this.queue) {
             const path = `./modmail_cache/${entry}.json`;
-            if (fs.existsSync(path)) return;
+            if (!fs.existsSync(path)) this.client.logger.warn(`User ${entry} is in queue but is missing history. Attempting to recover history.`);
 
-            this.client.logger.warn(`User ${entry} is in queue but is missing history. Attempting to recover history.`);
             const user = await this.client.resolveUser(entry);
             const dm = await user.createDM();
             let messages = await dm.messages.fetch();
-            messages = messages.filter(msg => msg.author.id !== this.client.user.id).sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+            messages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp).map(msg => msg); // .filter(msg => msg.author.id !== this.client.user.id)
+            const amt = messages.length;
 
             const history = await this.loadModmailHistory(entry);
-            for (const { author, content, createdTimestamp, attachments } of messages.values()) {
+            
+            if (history.length) { // Sync user's past messages with the bot's cache if one exists
+                const last = history[history.length - 1];
+                let index = amt - 1; 
+                for (index; index >= 0; index--) { // Find the most recent message that is also in the user's history
+                    const msg = messages[index];
+                    if (msg.content === last.content || msg.embeds.length && msg.author.bot) {
+                        messages = messages.slice(index+1).filter(m => !m.author.bot);
+                        break;
+                    }
+                }
+                
+                if (messages.length) this.client.logger.warn(`User ${entry} has previous history but is out of sync, attempting sync. ${messages.length} messages out of sync.`);
+                else continue;
+            }
+
+            history.push({ timestamp: Date.now(), author: this.client.user.id, content: 'Attempted a recovery of missing messages at this point, messages may look out of place if something went wrong.' });
+            for (const { author, content, createdTimestamp, attachments } of messages) {
+                if (author.bot) continue;
                 history.push({ attachments: attachments.map(att => att.url), author: author.id, content, timestamp: createdTimestamp });
             }
             this.updatedThreads.push(entry);
