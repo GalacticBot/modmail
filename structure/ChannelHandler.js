@@ -124,7 +124,16 @@ class ChannelHandler {
             if (!channel) { // Create and populate channel
                 channel = await guild.channels.create(`${user.username}_${user.discriminator}`, {
                     parent: this.newMail.id
+                }).catch(err => {
+                    this.client.logger.warn(`Failed to create channel for ${user.tag}, trying again.\n${err.stack || err}`);
                 });
+                if (!channel) channel = await guild.channels.create(`${user.id}`, {
+                    parent: this.newMail.id
+                }).catch(err => {
+                    // this.client.logger.error(`Failed on second create:\n${err.stack || err}`);
+                    return { err };
+                });
+                if (!channel.err) return reject(channel.err);
 
                 // Start with user info embed
                 const embed = {

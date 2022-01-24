@@ -156,7 +156,7 @@ class Modmail {
         
         const channel = await this.channels.load(member, pastModmail)
             .catch((err) => {
-                this.client.logger.error(`Error during channel handling:\n${err.stack}`);
+                this.client.logger.error(`Error during channel handling:\n${err.stack || err}`);
                 return { error: true };
             });
         if (channel.error) return author.send(`Internal error, this has been logged.`);
