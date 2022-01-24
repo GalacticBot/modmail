@@ -133,7 +133,7 @@ class ChannelHandler {
                     // this.client.logger.error(`Failed on second create:\n${err.stack || err}`);
                     return { err };
                 });
-                if (!channel.err) return reject(channel.err);
+                if (channel.err) return reject(channel.err);
 
                 // Start with user info embed
                 const embed = {
