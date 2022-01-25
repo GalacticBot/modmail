@@ -14,6 +14,7 @@ class Queue extends Command {
         const { queue } = this.client.modmail;
         if (!queue.length) return 'Queue is empty!';
 
+        await this.client.cache.verifyQueue();
         const users = await this.client.resolveUsers(queue);
         let str = ``,
             count = 0;
