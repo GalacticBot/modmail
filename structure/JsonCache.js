@@ -1,4 +1,5 @@
 const fs = require('fs');
+const pathUtil = require('path');
 const CacheHandler = require('./abstractions/CacheHandler');
 
 class JsonCache extends CacheHandler {
@@ -97,8 +98,8 @@ class JsonCache extends CacheHandler {
         this.client.logger.info(`Verifying modmail queue.`);
 
         for (const entry of this.queue) {
-            const path = `../modmail_cache/${entry}.json`;
-            if (!fs.existsSync(path)) this.client.logger.warn(`User ${entry} is in queue but is missing history. Attempting to recover history.`);
+            const path = `./modmail_cache/${entry}.json`;
+            if (!fs.existsSync(pathUtil.resolve(path))) this.client.logger.warn(`User ${entry} is in queue but is missing history. Attempting to recover history.`);
 
             const user = await this.client.resolveUser(entry);
             const dm = await user.createDM();
