@@ -97,7 +97,7 @@ class JsonCache extends CacheHandler {
         this.client.logger.info(`Verifying modmail queue.`);
 
         for (const entry of this.queue) {
-            const path = `./modmail_cache/${entry}.json`;
+            const path = `../modmail_cache/${entry}.json`;
             if (!fs.existsSync(path)) this.client.logger.warn(`User ${entry} is in queue but is missing history. Attempting to recover history.`);
 
             const user = await this.client.resolveUser(entry);
