@@ -259,7 +259,7 @@ class ChannelHandler {
                         delete this.modmail.cache.channels[userId];
                     }
                 }).catch((err) => {
-                    this.client.logger.error(`Failed to delete channel from graveyard during sweep:\n${err.stack}`);
+                    this.client.logger.error(`Failed to delete channel ${channel?.id || channel} from graveyard during sweep:\n${err.stack}`);
                 });
                 channelCount++;
             }
