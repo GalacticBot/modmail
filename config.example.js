@@ -18,6 +18,7 @@ module.exports = {
     modmailReminderInterval: 10, // How often the bot should send a reminder of x new modmails in queue
     modmailReminderChannel: '', // channel to send reminders in
     logChannel: '', // Channel in which modmail logs are sent
+    inlineResponse: null, // The response the bot gives when a user DMs the bot, null will have the bot use the default
     clientOptions: {
         intents: [ // Needs at least these
             'GUILDS',

@@ -22,6 +22,7 @@ class Modmail {
         this._reminderChannel = opts.modmailReminderChannel || null;
         this._logChannel = opts.logChannel || null;
         this.categories = opts.modmailCategory;
+        this.inlineResponse = opts.inlineResponse || `Thank you for your message, we'll get back to you soon!`;
 
         this.updatedThreads = [];
         this.queue = [];
@@ -143,7 +144,7 @@ class Modmail {
 
         const lastActivity = this.cache.lastActivity[author.id];
         if (!lastActivity || now - lastActivity > 30 * 60) { // No point in sending this for *every* message
-            await author.send(`Thank you for your message, we'll get back to you soon!`);
+            await author.send(this.inlineResponse);
         }
         this.cache.lastActivity[author.id] = now;
 
