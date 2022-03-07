@@ -25,17 +25,27 @@ class CannedReply extends Command {
         } else if ([ 'create', 'delete' ].includes(op)) {
             return this.createCanned(op, args, message);
         } else if ([ 'list' ].includes(first.toLowerCase(op))) {
-
             const list = Object.entries(this.client.modmail.replies);
             let str = '';
             // eslint-disable-next-line no-shadow
-            for (const [ name, content ] of list) {
-                const substr = `**${name}:** ${content}\n`;
-                if (str.length + substr.length > 2000) {
-                    await channel.send(str);
-                    str = '';
+            if ([ 'raw' ].includes(first.toLowerCase(op))) {
+                for (const [ name, content ] of list) {
+                    const substr = `**${name}:** \`${content}\`\n`;
+                    if (str.length + substr.length > 2000) {
+                        await channel.send(str);
+                        str = '';
+                    }
+                    str += substr;
                 }
-                str += substr;
+            } else{
+                for (const [ name, content ] of list) {
+                    const substr = `**${name}:** ${content}\n`;
+                    if (str.length + substr.length > 2000) {
+                        await channel.send(str);
+                        str = '';
+                    }
+                    str += substr;
+                }
             }
             if (str.length) return channel.send(str);
             return '**__None__**';
