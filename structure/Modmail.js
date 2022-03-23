@@ -188,7 +188,7 @@ class Modmail {
             });
         }
 
-        pastModmail.push({ attachments, author: author.id, content, timestamp: Date.now(), isReply: false });
+        pastModmail.push({ attachments, author: author.id, content, timestamp: Date.now(), isReply: false, msgId: message.id });
         if (!this.updatedThreads.includes(author.id)) this.updatedThreads.push(author.id);
         if (!this.queue.includes(author.id)) this.queue.push(author.id);
         
