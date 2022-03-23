@@ -19,12 +19,13 @@ class CannedReply extends Command {
             anon = false;
         content = content.replace(`${this.client.prefix}${_caller}`, '');
         const op = args.shift().toLowerCase();
+        
         if (op === 'anon') {
             anon = true;
             content = content.replace(first, '');
         } else if ([ 'create', 'delete' ].includes(op)) {
             return this.createCanned(op, args, message);
-        } else if ([ 'list' ].includes(first.toLowerCase(op))) {
+        } else if ([ 'list' ].includes(first.toLowerCase())) {
 
             const list = Object.entries(this.client.modmail.replies);
             let str = '';
@@ -39,7 +40,9 @@ class CannedReply extends Command {
             }
             if (str.length) return channel.send(str);
             return '**__None__**';
+
         }
+
         return this.client.modmail.sendCannedResponse({ message, responseName: content.trim(), anon });
 
     }

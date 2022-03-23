@@ -75,7 +75,7 @@ class ModmailClient extends Client {
     ready () {
 
         return new Promise((resolve) => {
-            if (this._ready) resolve();
+            if (this._ready) return resolve();
             this.once('ready', resolve);
         });
 
@@ -162,6 +162,22 @@ class ModmailClient extends Client {
             .catch((error) => { // eslint-disable-line no-unused-vars, handle-callback-err
                 return null;
             });
+
+    }
+
+    getUserFromChannel (channel) {
+
+        const chCache = this.cache.channels;
+        const result = Object.entries(chCache).find(([ , val ]) => {
+            return val === channel.id;
+        });
+
+        if (!result) return {
+            error: true,
+            msg: `This doesn't seem to be a valid modmail channel. Cache might be out of sync. **[MISSING TARGET]**`
+        };
+
+        return result;
 
     }
 
