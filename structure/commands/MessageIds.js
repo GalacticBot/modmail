@@ -26,16 +26,17 @@ class MessageIds extends Command {
         const history = await this.client.cache.loadModmailHistory(userId);
         const sorted = history.sort((a, b) => b.timestamp - a.timestamp);
         const idContentPairs = [];
+        const urlBase = `https://discord.com/channels/@me`;
 
         for (const mm of sorted) {
             if (!mm.msgid && !mm.isReply) break; // Old modmails from before msg id logging -- could probably supplement with fetching messages but cba rn
-            idContentPairs.push(`${dmChannel.id}/${mm.msgid} - ${mm.content}`);
+            idContentPairs.push(`${urlBase}/${dmChannel.id}/${mm.msgid} - ${mm.content}`);
         }
 
         if (!idContentPairs.length) {
             const msgs = await dmChannel.messages.fetch();
             const sortedMsgs = msgs.filter(msg => msg.author.id !== this.client.user.id).sort((a, b) => b.createdTimestamp - a.createdTimestamp);
-            for (const msg of sortedMsgs.values()) idContentPairs.push(`${dmChannel.id}/${msg.id} - ${msg.content}`);
+            for (const msg of sortedMsgs.values()) idContentPairs.push(`${urlBase}/${dmChannel.id}/${msg.id} - ${msg.content}`);
         }
 
         await message.channel.send({
