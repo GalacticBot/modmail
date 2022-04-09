@@ -18,7 +18,7 @@
     "chalk": "^4.0.0",
     "diagnostics": "^2.0.2",
     "discord.js": "^12.5.3",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "winston": "^3.3.3",
     "winston-transport": "^4.4.0"
   }
