@@ -48,7 +48,7 @@ class JsonCache extends CacheHandler {
 
     savePersistentCache () {
         this.logger.debug('Saving cache');
-        fs.writeFileSync('./persistent_cache.json', JSON.stringify(this.json));
+        fs.writeFileSync('./persistent_cache.json', JSON.stringify(this.json, null, 4));
     }
 
     saveModmailHistory () {
@@ -62,7 +62,7 @@ class JsonCache extends CacheHandler {
         for (const id of toSave) {
             const path = `./modmail_cache/${id}.json`;
             try {
-                fs.writeFileSync(path, JSON.stringify(this.modmail[id]));
+                fs.writeFileSync(path, JSON.stringify(this.modmail[id], null, 4));
             } catch (err) {
                 this.client.logger.error(`Error during saving of history\n${id}\n${JSON.stringify(this.modmail)}\n${err.stack}`);
             }

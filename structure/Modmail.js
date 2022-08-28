@@ -378,7 +378,7 @@ class Modmail {
 
         if (!amount) {
             if (this.lastReminder) {
-                await this.lastReminder.delete();
+                await this.lastReminder.delete().catch(() => null);
                 this.lastReminder = null;
             }
             return;
