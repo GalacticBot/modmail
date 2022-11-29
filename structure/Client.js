@@ -106,7 +106,7 @@ class ModmailClient extends Client {
         const commandName = rawCommand.substring(prefix.length);
         const command = this.registry.find(commandName);
         if (!command) return;
-        message._caller = commandName.toLowerCase();
+        message._caller = commandName;
 
         if (command.showUsage && !args.length) {
 
