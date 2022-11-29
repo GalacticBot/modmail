@@ -102,7 +102,7 @@ class ModmailClient extends Client {
         const roles = member.roles.cache.map((r) => r.id);
         if (!roles.some((r) => this._options.staffRoles.includes(r)) && !member.hasPermission('ADMINISTRATOR')) return;
 
-        const [ rawCommand, ...args ] = content.split(' ');
+        const [ rawCommand, ...args ] = content.split(/\s+/u);
         const commandName = rawCommand.substring(prefix.length);
         const command = this.registry.find(commandName);
         if (!command) return;
