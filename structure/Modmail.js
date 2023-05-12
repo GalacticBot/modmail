@@ -362,7 +362,6 @@ class Modmail {
             response = await this.channels.setReadState(userId, channel, author, state);
         }
 
-        
         if (response.error) return response;
         this.log({ author, action: `${author.tag} marked ${user.tag}'s thread as ${state}`, target: user });
         return 'Done';

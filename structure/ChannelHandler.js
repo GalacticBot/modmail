@@ -92,7 +92,7 @@ class ChannelHandler {
         if (channel) await channel.edit({ parentID: state === 'read' ? this.readMail.id : this.newMail.id, lockPermissions: true });
         if (!this.cache.updatedThreads.includes(target)) this.cache.updatedThreads.push(target);
         if (this.cache.queue.includes(target) && state === 'read') this.cache.queue.splice(this.cache.queue.indexOf(target), 1);
-        else if (!this.cache.queue.includes(target)) this.cache.queue.push(target);
+        else if (!this.cache.queue.includes(target) && state === 'unread') this.cache.queue.push(target);
         return {};
 
     }
