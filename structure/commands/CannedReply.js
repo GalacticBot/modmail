@@ -38,9 +38,13 @@ class CannedReply extends Command {
                 }
                 str += substr;
             }
-            if (str.length) return channel.send(str);
-            return '**__None__**';
-
+            if (!str.length) return '**__None__**';
+            if (args[2] === "inChannel"){
+                return channel.send(str);
+            }else{
+                const dmChannel = await message.author.createDM();
+                return dmChannel.send(str);
+            }
         }
 
         return this.client.modmail.sendCannedResponse({ message, responseName: content.trim(), anon });
