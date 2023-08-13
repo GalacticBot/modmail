@@ -29,7 +29,7 @@ class CannedReply extends Command {
 
             const list = Object.entries(this.client.modmail.replies);
             let str = '';
-            if (second?.toLowerCase() === '-dm') channel = await message.author.createDM();
+            if (second?.toLowerCase() !== '-here') channel = await message.author.createDM();
             // eslint-disable-next-line no-shadow
             for (const [ name, content ] of list) {
                 const substr = `**${name}:** ${content}\n`;
