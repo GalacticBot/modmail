@@ -13,7 +13,7 @@ class CannedReply extends Command {
 
     async execute (message, { args }) {
         
-        const [ first ] = args.map((a) => a);
+        const [ first, second ] = args.map((a) => a);
         // eslint-disable-next-line prefer-const
         let { channel, content, _caller } = message,
             anon = false;
@@ -29,6 +29,7 @@ class CannedReply extends Command {
 
             const list = Object.entries(this.client.modmail.replies);
             let str = '';
+            if (second.toLowerCase() === '-dm') channel = await message.author.createDM();
             // eslint-disable-next-line no-shadow
             for (const [ name, content ] of list) {
                 const substr = `**${name}:** ${content}\n`;

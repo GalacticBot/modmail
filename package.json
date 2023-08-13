@@ -8,7 +8,8 @@
   "description": "Modmail bot with eventual integration with Galactic Bot's API",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon --ignore *.json index.js"
+    "dev": "nodemon --ignore *.json index.js",
+    "dockerpub": "tsc && docker build . --tag navydotgif/modmail:latest && docker push navydotgif/modmail:latest "
   },
   "devDependencies": {
     "eslint": "^7.28.0",
