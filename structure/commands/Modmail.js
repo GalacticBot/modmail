@@ -12,7 +12,6 @@ class Modmail extends Command {
     }
 
     async execute (message, { args }) {
-
         // eslint-disable-next-line prefer-const
         let [ first, second ] = args.map((a) => a);
         // eslint-disable-next-line prefer-const
@@ -37,15 +36,14 @@ class Modmail extends Command {
             error: true,
             msg: 'Cannot send modmail to a bot.'
         };
-        content = content.replace(first, '');
+        content = content.replace(first, '').trim();
 
         if (!content.length) return {
             error: true,
             msg: `Cannot send empty message`
         };
 
-        return this.client.modmail.sendModmail({ message, content: content.trim(), anon, target: user });
-
+        return this.client.modmail.sendModmail({ message, content, anon, target: user });
     }
 
 }
